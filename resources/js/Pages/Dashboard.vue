@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import tableComponent from "@/Components/Jcomponents/tableComponent.vue";
 import selectMenuComponent from "@/Components/Jcomponents/selectMenuComponent.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const headers = ref([
     { text: ' #', },
@@ -18,21 +18,34 @@ const headers = ref([
     { text: ' Acción', },
 ]);
 
-const items  = ref([
-    {
-        id: '1',
-        codigo: '5346f9e0-7ee0-11ee-b962-0242ac120002',
-        servicio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit',
-        tipo_servicio: 'Lorem ipsum dolor',
-        ubicacion: '5402 Margaretta Stravenue, Deonberg, IA 05039-8529',
-        coordenadas: '26.65195, 56.36255',
-        status: 1,
-        precio: '999.999,99',
-        usr_creador: 'asdasd',
-        usr_solicitante: 'asdasd',
-        accion: 'asdas',
-    },
-])
+// const items = ref([
+//     {
+//         id: '1',
+//         codigo: '5346f9e0-7ee0-11ee-b962-0242ac120002',
+//         servicio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit',
+//         tipo_servicio: 'Lorem ipsum dolor',
+//         ubicacion: '5402 Margaretta Stravenue, Deonberg, IA 05039-8529',
+//         coordenadas: '26.65195, 56.36255',
+//         status: 1,
+//         precio: '999.999,99',
+//         usr_creador: 'asdasd',
+//         usr_solicitante: 'asdasd',
+//         accion: 'asdas',
+//     },
+// ])
+
+const items = ref([])
+const getServicios = async () => {
+    try {
+        let { data } = await axios('/api/servicios')
+        for (const iterator of data) {
+            iterator.accion = ''
+        }
+        items.value = data
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const options = ref([
     {
@@ -50,7 +63,20 @@ const options = ref([
 
 ])
 
+const search_var = ref('')
 
+const pusher = new Pusher('8cc670e9cb23b3630615', {
+    cluster: 'us2'
+});
+
+const channel = pusher.subscribe('servicio-channel');
+channel.bind('store-event-servicio', function (data) {
+    getServicios()
+});
+
+onMounted(() => {
+    getServicios()
+})
 
 </script>
 
@@ -61,16 +87,28 @@ const options = ref([
                 Dashboard
             </h2>
         </template>
-
         <div class="py-12">
             <div class=" mx-auto">
-                <tableComponent :headers="headers" :items="items">
-                    <template v-slot:precio="{ item }">
+                <tableComponent :headers="headers" :items="items" :search="search_var"
+                    search_by_index_value="tipo_servicio">
+                    <template #header>
+                        <label for="search" class="flex relative">
+                            <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" class="text-[#d9d9d9] left-2 absolute self-center ">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M10 5.5C7.51472 5.5 5.5 7.51472 5.5 10C5.5 12.4853 7.51472 14.5 10 14.5C10.7763 14.5 11.5046 14.3041 12.1403 13.9596C12.5244 13.7514 12.8751 13.4888 13.182 13.182C13.4888 12.8751 13.7514 12.5244 13.9596 12.1403C14.3041 11.5046 14.5 10.7763 14.5 10C14.5 7.51472 12.4853 5.5 10 5.5ZM4 10C4 6.68629 6.68629 4 10 4C13.3137 4 16 6.68629 16 10C16 11.032 15.7388 12.0052 15.2784 12.855C15.1212 13.145 14.9409 13.4206 14.7399 13.6792L20.003 18.9423L18.9423 20.003L13.6792 14.7399C13.4206 14.9408 13.1451 15.1212 12.855 15.2784C12.0052 15.7388 11.032 16 10 16C6.68629 16 4 13.3137 4 10Z"
+                                    fill="currentColor" />
+                            </svg>
+                            <input id="search" type="text" class="rounded-lg border-gray-300 pl-10" placeholder="Buscar"
+                                v-model="search_var" />
+                        </label>
+                    </template>
+                    <template #precio="{ item }">
                         <p class="font-bold text-[17px] text-green-400 whitespace-nowrap">
                             $ {{ item.precio }}
                         </p>
                     </template>
-                    <template v-slot:status="{ item }">
+                    <template #status="{ item }">
                         <div :class="{
                             'center animate-pulse relative inline-block select-none whitespace-nowrap rounded-lg bg-green-500 py-2 px-3.5 align-baseline font-sans text-xs font-bold uppercase leading-none text-white': item.status == 1,
                             'center animate-pulse relative inline-block select-none whitespace-nowrap rounded-lg bg-red-500 py-2 px-3.5 align-baseline font-sans text-xs font-bold uppercase leading-none text-white': item.status == 0
@@ -78,23 +116,23 @@ const options = ref([
                             <div class="mt-px">{{ item.status == 1 ? 'Activo' : 'Desactivado' }}</div>
                         </div>
                     </template>
-                    <template v-slot:usr_creador="{ item }">
+                    <template #usr_creador="{ item }">
                         <div class="flex items-center flex-col">
                             <img src="https://randomuser.me/api/portraits/women/11.jpg" alt=""
                                 class="rounded-full w-16 h-16 object-cover" />
                             <h5 class="font-semibold">{{ item.usr_creador }}</h5>
                         </div>
                     </template>
-                    <template v-slot:usr_solicitante="{ item }">
+                    <template #usr_solicitante="{ item }">
                         <div class="flex items-center flex-col">
                             <img src="https://randomuser.me/api/portraits/women/28.jpg" alt=""
                                 class="rounded-full w-16 h-16 object-cover" />
                             <h5 class="font-semibold">{{ item.usr_solicitante }}</h5>
                         </div>
                     </template>
-                    <template v-slot:accion>
+                    <template #accion>
                         <selectMenuComponent :options="options">
-                            <template v-slot:opcion_1>
+                            <template #opcion_1>
                                 <svg width="25px"
                                     class="text-blue-500 cursor-pointer active:bg-blue-200 w-fit h-fit rounded-full"
                                     height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +144,7 @@ const options = ref([
                                         fill="currentColor" />
                                 </svg>
                             </template>
-                            <template v-slot:opcion_2>
+                            <template #opcion_2>
                                 <svg width="25px" height="25px"
                                     class="text-yellow-500 cursor-pointer active:bg-yellow-200 w-fit h-fit rounded-full"
                                     viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,7 +160,7 @@ const options = ref([
                                         stroke-linejoin="round" />
                                 </svg>
                             </template>
-                            <template v-slot:opcion_3>
+                            <template #opcion_3>
                                 <svg width="25px"
                                     class="text-red-500 cursor-pointer active:bg-red-200 w-fit h-fit rounded-full"
                                     height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

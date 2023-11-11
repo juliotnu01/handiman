@@ -5,7 +5,7 @@ const toggleMenu = ref(false);
 
 defineProps({
     options: {
-        // type: { text: '', value: '' },
+        type: Array,
         default:[],
         required: true
     }
