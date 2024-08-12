@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServicioController;
 use App\Models\Servicio;
+use App\Http\Controllers\Auth\ExternalLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,5 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::get('/', [ServicioController::class, 'index']);
     Route::post('/store', [ServicioController::class, 'store']);
 });
+
+Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
