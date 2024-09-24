@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServicioController;
 use App\Models\Servicio;
 use App\Http\Controllers\Auth\ExternalLoginController;
+use App\Http\Controllers\EspecialistaController;
+use App\Http\Controllers\TipoServicioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +28,6 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::post('/store', [ServicioController::class, 'store']);
 });
 
+Route::get('/tipos-servicios', [TipoServicioController::class, 'index'])->name('tipos.servicios');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
+Route::post('/register-especialista', [EspecialistaController::class, 'store'])->name('store.especialista');
