@@ -13,4 +13,8 @@ class Especialista extends Model
     public function servicios()  {
         return $this->belongsToMany(TipoServicio::class);
     }
+
+    public function certificados()  {
+        return $this->hasMany(DocumentosEspecialista::class);
+    }
 }

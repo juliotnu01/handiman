@@ -14,7 +14,12 @@ class EspecialistaController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $especialista = Especialista::with(['servicios', 'certificados'])->get();
+            return $especialista;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -65,7 +70,7 @@ class EspecialistaController extends Controller
                 if ($request->has('servicios')) {
                     $servicioIds = collect($request->servicios)->map(function ($servicio) {
                         $decodedServicio = json_decode($servicio, true);
-                        return $decodedServicio['id']; 
+                        return $decodedServicio['id'];
                     })->toArray();
                     $especialista->servicios()->sync($servicioIds);
                 }
@@ -110,6 +115,22 @@ class EspecialistaController extends Controller
     public function update(Request $request, Especialista $especialista)
     {
         //
+    }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function updateStatusEspecialista(Request $request, $id)
+    {
+        try {
+            $newStatus = !$request->status;
+            
+            $especialista = new Especialista();
+            $especialista->find($id)->update([
+                "status" => $newStatus
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

@@ -18,21 +18,6 @@ const headers = ref([
     { text: ' Acción', },
 ]);
 
-// const items = ref([
-//     {
-//         id: '1',
-//         codigo: '5346f9e0-7ee0-11ee-b962-0242ac120002',
-//         servicio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit',
-//         tipo_servicio: 'Lorem ipsum dolor',
-//         ubicacion: '5402 Margaretta Stravenue, Deonberg, IA 05039-8529',
-//         coordenadas: '26.65195, 56.36255',
-//         status: 1,
-//         precio: '999.999,99',
-//         usr_creador: 'asdasd',
-//         usr_solicitante: 'asdasd',
-//         accion: 'asdas',
-//     },
-// ])
 
 const items = ref([])
 const getServicios = async () => {

@@ -28,6 +28,12 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::post('/store', [ServicioController::class, 'store']);
 });
 
+Route::group(['prefix' => 'especialistas'],function () {
+    Route::get('/', [EspecialistaController::class, 'index'])->name('get.especialistas');
+    Route::put('/update-status-especialista/{id}', [EspecialistaController::class, 'updateStatusEspecialista'])->name('update.status.especialistas');
+
+});
+
 Route::get('/tipos-servicios', [TipoServicioController::class, 'index'])->name('tipos.servicios');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
 Route::post('/register-especialista', [EspecialistaController::class, 'store'])->name('store.especialista');
