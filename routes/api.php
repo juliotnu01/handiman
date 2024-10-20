@@ -31,6 +31,7 @@ Route::group(['prefix' => 'servicios'],function () {
 Route::group(['prefix' => 'especialistas'],function () {
     Route::get('/', [EspecialistaController::class, 'index'])->name('get.especialistas');
     Route::put('/update-status-especialista/{id}', [EspecialistaController::class, 'updateStatusEspecialista'])->name('update.status.especialistas');
+    Route::put('/update-revision-especialista/{id}', [EspecialistaController::class, 'updateRevisionEspecialista'])->name('update.revision.especialistas');
 
 });
 

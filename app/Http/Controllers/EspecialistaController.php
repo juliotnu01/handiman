@@ -48,6 +48,7 @@ class EspecialistaController extends Controller
                 $especialista->correo = $request['correo'];
                 $especialista->numero_identificacion = $request['numero_identificacion'];
                 $especialista->status = false;
+                $especialista->revision = true;
 
 
                 if ($request->hasFile('documento_identidad.frontal')) {
@@ -126,6 +127,18 @@ class EspecialistaController extends Controller
             $especialista = new Especialista();
             $especialista->find($id)->update([
                 "status" => $newStatus
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function updateRevisionEspecialista(Request $request, $id)
+    {
+        try {
+            $newStatus = !$request->revision;
+            $especialista = new Especialista();
+            $especialista->find($id)->update([
+                "revision" => $newStatus
             ]);
         } catch (\Throwable $th) {
             throw $th;

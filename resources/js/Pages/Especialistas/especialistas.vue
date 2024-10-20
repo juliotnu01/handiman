@@ -7,6 +7,7 @@ import { ref, onMounted } from "vue";
 
 
 const showModalDocumentos = ref(false)
+const showSpingRevision = ref(false)
 const showModalIdentificacion = ref(false)
 const showModalAvatar = ref(false)
 const IDSHOW = ref({
@@ -24,6 +25,7 @@ const headerEspecialistas = ref([
     { text: 'Fecha Nacimiento', field: 'fecha_nacimiento' },
     { text: 'Correo', field: 'correo' },
     { text: 'Status', field: 'status' },
+    { text: 'Revision', field: 'revision' },
     { text: 'Activacion', field: 'id' },
     { text: 'Certificados', },
     { text: 'Servicios', field: 'servicios' },
@@ -34,6 +36,10 @@ const especialistas = ref([]);
 const getEspecialistasData = async () => {
     try {
         let { data } = await axios(route('get.especialistas'))
+        for (const element of data) {
+            element.showSpingRevision = false
+            element.showSpingStatus = false
+        }
         // const { data } = response.data
         especialistas.value = data
     } catch (error) {
@@ -78,8 +84,22 @@ const isChecked = ref(switchValue.value === 1);
 // Función para alternar el switch
 const toggleSwitch = async (id, status) => {
     try {
-        await axios.put( route('update.status.especialistas', {id: id}), {status: status})
+        id.showSpingStatus = true
+        await axios.put(route('update.status.especialistas', { id: id }), { status: status })
         getEspecialistasData()
+        id.showSpingStatus = false
+    } catch (error) {
+        console.log({ error });
+
+    }
+};
+
+const toggleSwitchRevision = async (id, status) => {
+    try {
+        id.showSpingRevision = true
+        await axios.put(route('update.revision.especialistas', { id: id }), { revision: status })
+        getEspecialistasData()
+        id.showSpingRevision = false
     } catch (error) {
         console.log({ error });
 
@@ -169,14 +189,51 @@ onMounted(() => {
                                 item.status === 1 ? 'bg-green-500' : 'bg-gray-300'
                             ]">
                                 <div :class="[
-                                    'absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out transform',
+                                    'absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out transform flex items-center justify-center',
                                     item.status === 1 ? 'translate-x-7' : 'translate-x-0'
-                                ]"></div>
+                                ]">
+                                    <svg v-show="item.showSpingStatus" class="animate-spin h-5 w-5 text-gray-900"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </div>
                             </div>
                         </label>
                     </div>
                 </template>
-                <template #8="{ item }">
+                <template #revision="{ item }">
+                    <div class="flex items-center">
+                        <input type="checkbox" :checked="item.revision === 1"
+                            @click="toggleSwitchRevision(item, item.revision)" class="sr-only"
+                            :id="`toggleSwitchRevision-${item.id}`" />
+                        <label :for="`toggleSwitchRevision-${item.id}`" class="flex items-center cursor-pointer">
+                            <div :class="[
+                                'relative w-14 h-7 rounded-full transition-colors duration-200 ease-in-out',
+                                item.revision === 1 ? 'bg-green-500' : 'bg-gray-300'
+                            ]">
+                                <div :class="[
+                                    'absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out transform flex items-center justify-center',
+                                    item.revision === 1 ? 'translate-x-7' : 'translate-x-0'
+                                ]">
+                                    <svg v-show="item.showSpingRevision" class="animate-spin h-5 w-5 text-gray-900"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                </template>
+                <template #9="{ item }">
                     <div class="flex justify-center">
                         <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
                             class="self-center text-purple-600 cursor-pointer " @click="ShowDocumentos(item)">
