@@ -123,7 +123,6 @@ class EspecialistaController extends Controller
     {
         try {
             $newStatus = !$request->status;
-            
             $especialista = new Especialista();
             $especialista->find($id)->update([
                 "status" => $newStatus
