@@ -6,6 +6,7 @@ use App\Models\{Especialista, DocumentosEspecialista};
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\EspecialistaRequest;
 
 class EspecialistaController extends Controller
 {
@@ -33,7 +34,7 @@ class EspecialistaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EspecialistaRequest $request)
     {
         try {
             return DB::transaction(function () use ($request) {
@@ -47,6 +48,7 @@ class EspecialistaController extends Controller
                 $especialista->fecha_nacimiento = $request['fecha_nacimiento'];
                 $especialista->correo = $request['correo'];
                 $especialista->numero_identificacion = $request['numero_identificacion'];
+                $especialista->user_id = $request['user_id'];
                 $especialista->status = false;
                 $especialista->revision = true;
 
