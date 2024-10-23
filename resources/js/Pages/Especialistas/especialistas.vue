@@ -6,6 +6,7 @@ import DialogComponent from "@/Components/DialogModal.vue";
 import { ref, onMounted } from "vue";
 
 
+const showModalServicios = ref(false)
 const showModalDocumentos = ref(false)
 const showSpingRevision = ref(false)
 const showModalIdentificacion = ref(false)
@@ -16,6 +17,7 @@ const IDSHOW = ref({
 })
 const AVATARSHOW = ref('')
 const documentos = ref([])
+const serviciosPrestados = ref([])
 
 const headerEspecialistas = ref([
     { text: '' },
@@ -28,7 +30,7 @@ const headerEspecialistas = ref([
     { text: 'Revision', field: 'revision' },
     { text: 'Activacion', field: 'id' },
     { text: 'Certificados', },
-    { text: 'Servicios', field: 'servicios' },
+    { text: 'Servicios prestados', field: 'servicios' },
 ]);
 
 const especialistas = ref([]);
@@ -40,19 +42,13 @@ const getEspecialistasData = async () => {
             element.showSpingRevision = false
             element.showSpingStatus = false
         }
-        // const { data } = response.data
+
         especialistas.value = data
     } catch (error) {
         console.log({ error });
 
     }
 }
-
-const menuOptions = ref([
-    { text: 'option1', value: 'Opción 1' },
-    { text: 'option2', value: 'Opción 2' },
-    { text: 'option3', value: 'Opción 3' }
-]);
 
 const ShowIdentificacion = (id) => {
     IDSHOW.value.front = id.url_documento_identificacion_frontal
@@ -62,26 +58,18 @@ const ShowIdentificacion = (id) => {
 const ShowAvatar = (id) => {
     AVATARSHOW.value = id.url_avatar
     showModalAvatar.value = true
-
 }
 const ShowDocumentos = (id) => {
     documentos.value = id.certificados
     showModalDocumentos.value = true
-
 }
-
 const isImage = (url) => {
     const imageExtensions = ['jpg', 'jpeg', 'png'];
     const extension = url.split('.').pop().toLowerCase();
     return imageExtensions.includes(extension);
 };
-
 const switchValue = ref(0);
-
-// Computed para determinar si el switch está "checked" (1) o no (0)
 const isChecked = ref(switchValue.value === 1);
-
-// Función para alternar el switch
 const toggleSwitch = async (id, status) => {
     try {
         id.showSpingStatus = true
@@ -93,7 +81,6 @@ const toggleSwitch = async (id, status) => {
 
     }
 };
-
 const toggleSwitchRevision = async (id, status) => {
     try {
         id.showSpingRevision = true
@@ -105,8 +92,10 @@ const toggleSwitchRevision = async (id, status) => {
 
     }
 };
-
-
+const toggleServiciosPrestados = async (servicios) => {
+    showModalServicios.value = true
+    serviciosPrestados.value = servicios
+};
 onMounted(() => {
     getEspecialistasData()
 })
@@ -172,11 +161,16 @@ onMounted(() => {
                 </template>
                 <template #servicios="{ value }">
                     <div class="flex flex-wrap gap-2 justify-start overflow-hidden max-w-[75%]">
-                        <!-- Mostrar primeras 5 píldoras -->
-                        <div v-for="(servicio, s) in value" :key="s"
-                            class="px-3 py-1 bg-gray-300 rounded-full text-sm min-w-fit">
-                            {{ servicio.nombre }}
-                        </div>
+                        <template v-for="(servicio, s) in value" :key="s">
+                            <div v-if="s < 5" class="px-3 py-1 bg-gray-300 rounded-full text-sm min-w-fit">
+                                {{ servicio.nombre }}
+                            </div>
+                        </template>
+
+                        <button v-if="value.length > 5" class="px-3 py-1 text-blue-600 text-sm hover:underline"
+                            @click="toggleServiciosPrestados(value)">
+                            Ver más ({{ value.length - 5 }})
+                        </button>
                     </div>
                 </template>
                 <template #id="{ item }">
@@ -330,6 +324,33 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
+            </template>
+        </DialogComponent>
+        <DialogComponent :show="showModalServicios">
+            <template #title>
+                <div class="flex justify-between">
+                    <p> Servicios prestados </p>
+                    <svg width="20px" height="20px" viewBox="0 0 512 512" version="1.1"
+                        @click="showModalServicios = false" class=" cursor-pointer  ">
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="work-case" fill="#000000" transform="translate(91.520000, 91.520000)">
+                                <polygon id="Close"
+                                    points="328.96 30.2933333 298.666667 1.42108547e-14 164.48 134.4 30.2933333 1.42108547e-14 1.42108547e-14 30.2933333 134.4 164.48 1.42108547e-14 298.666667 30.2933333 328.96 164.48 194.56 298.666667 328.96 328.96 298.666667 194.56 164.48">
+
+                                </polygon>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </template> 
+            <template #content>
+                <div class="flex flex-wrap gap-2 justify-start overflow-hidden max-w-[75%]">
+                        <template v-for="(servicio, s) in serviciosPrestados" :key="s">
+                            <div  class="px-3 py-1 bg-gray-300 rounded-full text-sm min-w-fit">
+                                {{ servicio.nombre }}
+                            </div>
+                        </template>
+                    </div>
             </template>
         </DialogComponent>
     </AppLayout>
