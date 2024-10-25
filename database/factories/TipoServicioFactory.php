@@ -17,7 +17,7 @@ class TipoServicioFactory extends Factory
     public function definition(): array
     {
         return [
-            "nombre" => $this->faker->sentence()
+            "nombre" => $this->faker->sentence(3)
         ];
     }
 }

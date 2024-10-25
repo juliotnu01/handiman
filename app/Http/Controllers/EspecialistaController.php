@@ -140,8 +140,26 @@ class EspecialistaController extends Controller
             $newStatus = !$request->revision;
             $especialista = new Especialista();
             $especialista->find($id)->update([
-                "revision" => $newStatus
+                "revision" => $newStatus,
             ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function getRevisionEspecialista($id)
+    {
+        try {
+            $especialista = Especialista::where('user_id', $id)->first();
+            if ($especialista) {
+                $register = $especialista ?? 1 ;
+                $revision = $especialista->revision;
+                $satus = $especialista->status;
+            } else {
+                $register = null;
+                $revision = null;
+                $satus = null;
+            }
+            return response()->json(["register" => $register, "revision" =>  $revision,  "status" => $satus]);
         } catch (\Throwable $th) {
             throw $th;
         }
