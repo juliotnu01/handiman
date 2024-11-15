@@ -186,8 +186,7 @@ onMounted(() => {
                                     'absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out transform flex items-center justify-center',
                                     item.status === 1 ? 'translate-x-7' : 'translate-x-0'
                                 ]">
-                                    <svg v-show="item.showSpingStatus" class="animate-spin h-5 w-5 text-gray-900"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg v-show="item.showSpingStatus" class="animate-spin h-5 w-5 text-gray-900" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor"
@@ -213,8 +212,7 @@ onMounted(() => {
                                     'absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out transform flex items-center justify-center',
                                     item.revision === 1 ? 'translate-x-7' : 'translate-x-0'
                                 ]">
-                                    <svg v-show="item.showSpingRevision" class="animate-spin h-5 w-5 text-gray-900"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg v-show="item.showSpingRevision" class="animate-spin h-5 w-5 text-gray-900" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor"

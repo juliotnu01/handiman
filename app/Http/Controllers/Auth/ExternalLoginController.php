@@ -11,14 +11,18 @@ class ExternalLoginController extends Controller
 {
     public function verify(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-        $user = User::where('email', $request->email)->first();
-        if ($user && Hash::check($request->password, $user->password)) {
-            return response()->json(["valid" => true, "user" => $user]);
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+            $user = User::where('email', $request->email)->first();
+            if ($user && Hash::check($request->password, $user->password)) {
+                return response()->json(["valid" => true, "user" => $user]);
+            }
+            return response(400)->json(["valid" => false, "user" => null]);
+        } catch (\Throwable $th) {
+            throw $th;
         }
-        return response()->json(["valid" => false, "user" => null]);
     }
 }
