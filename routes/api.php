@@ -6,6 +6,7 @@ use App\Http\Controllers\ServicioController;
 use App\Models\Servicio;
 use App\Http\Controllers\Auth\ExternalLoginController;
 use App\Http\Controllers\EspecialistaController;
+use App\Http\Controllers\OfertaController;
 use App\Http\Controllers\TipoServicioController;
 
 /*
@@ -35,6 +36,12 @@ Route::group(['prefix' => 'especialistas'],function () {
     Route::put('/update-revision-especialista/{id}', [EspecialistaController::class, 'updateRevisionEspecialista'])->name('update.revision.especialistas');
 
 });
+
+// oferta
+Route::group(['prefix' => 'config-especialistas'],function () {
+    Route::post('/oferta', [OfertaController::class, 'store'])->name('save.oferta');
+});
+
 
 Route::get('/tipos-servicios', [TipoServicioController::class, 'index'])->name('tipos.servicios');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
