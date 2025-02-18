@@ -26,7 +26,7 @@ class BasicInformationUserSeeder extends Seeder
             // Crear datos para basic_information_users asociados al usuario
             BasicInformationUser::create([
                 'user_id' => $user->id,
-                'banner_photo_url' => 'https://loremipsum.io/1200/400', // Banner dinámico de Lorem Ipsum
+                'banner_photo_url' => 'https://picsum.photos/1200/400', // Banner dinámico de Lorem Ipsum
                 'title_user' => $faker->sentence, // Título del usuario, ahora es una frase completa
                 'user_mobile' => $faker->phoneNumber,
                 'main_address' => $faker->address,
