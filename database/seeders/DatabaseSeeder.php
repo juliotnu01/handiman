@@ -20,10 +20,7 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\TipoServicio::factory(10)->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        \App\Models\User::factory(50)->create();
         DB::table('basic_information_users')->truncate();
         $this->call([
             BasicInformationUserSeeder::class,

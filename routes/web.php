@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\{RolePermissionController, UsersController};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,12 +30,16 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
     Route::get('/especialistas', function () {
         return Inertia::render('Especialistas/especialistas');
     })->name('especialistas');
+
+    Route::get('/usuarios', [UsersController::class, 'index'])->name('usuarios.index');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
