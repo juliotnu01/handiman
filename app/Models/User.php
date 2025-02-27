@@ -63,7 +63,11 @@ class User extends Authenticatable
     ];
 
     public function basicInformation() {
-
         return $this->hasOne(BasicInformationUser::class, 'user_id');
+    }
+    
+    public function verificationIds()
+    {
+        return $this->belongsToMany(VerificationID::class, 'user_verificationid', 'user_id', 'verification_id');
     }
 }
