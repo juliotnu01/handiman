@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Certification;
 
 class UsersController extends Controller
 {
@@ -44,6 +46,37 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    public function storeCertications(Request $request)
+    {
+        $request->validate([
+            'files.*' => 'required|mimes:pdf|max:2048',
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $user_id = $request->input('user_id');
+        $description = $request->input('description', '');
+
+        $certifications = [];
+
+        foreach ($request->file('files') as $file) {
+            $path = $file->storeAs("public/certificados/users/{$user_id}", $file->getClientOriginalName());
+
+            $certifications[] = [
+                'certification_name' => $file->getClientOriginalName(),
+                'certificatin_path' => Storage::url($path),
+                'description' => $description,
+                'user_id' => $user_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Certification::insert($certifications);
+
+        return response()->json(['message' => 'Certificados subidos con exito'], 200);
     }
 
     /**

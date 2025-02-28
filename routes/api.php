@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ExternalLoginController;
 use App\Http\Controllers\EspecialistaController;
 use App\Http\Controllers\OfertaController;
 use App\Http\Controllers\TipoServicioController;
+use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VerificationIDController;
 
 /*
@@ -44,7 +45,7 @@ Route::group(['prefix' => 'config-especialistas'],function () {
 });
 
 Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('verify.user');
-
+Route::post('/upload-certificates', [UsersController::class, 'storeCertications'])->name('upload.certificates.user');
 
 Route::get('/tipos-servicios', [TipoServicioController::class, 'index'])->name('tipos.servicios');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);

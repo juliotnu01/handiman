@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
@@ -60,14 +61,51 @@ class User extends Authenticatable
      */
     protected $appends = [
         'profile_photo_url',
+        'has_all_verifications',
     ];
 
-    public function basicInformation() {
+    public function basicInformation()
+    {
         return $this->hasOne(BasicInformationUser::class, 'user_id');
     }
-    
+
     public function verificationIds()
     {
         return $this->belongsToMany(VerificationID::class, 'user_verificationid', 'user_id', 'verification_id');
+    }
+
+    public function certifications()
+    {
+        return $this->hasMany(Certification::class, 'user_id');
+    }
+
+    /**
+     * Definir el atributo personalizado `has_all_verifications`.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function hasAllVerifications(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->checkAllVerifications(),
+        );
+    }
+
+    /**
+     * Método privado para verificar si el usuario tiene todas las verificaciones requeridas.
+     *
+     * @return bool
+     */
+    private function checkAllVerifications(): bool
+    {
+        $requiredTypes = ['front', 'back'];
+        $hasAllVerifications = $this->verificationIds()
+            ->whereIn('type', $requiredTypes)
+            ->where('is_verified', true)
+            ->pluck('type')
+            ->unique()
+            ->count() === count($requiredTypes);
+
+        return $hasAllVerifications;
     }
 }
