@@ -46,6 +46,7 @@ Route::group(['prefix' => 'config-especialistas'],function () {
 
 Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('verify.user');
 Route::post('/upload-certificates', [UsersController::class, 'storeCertications'])->name('upload.certificates.user');
+Route::post('/store-payment-method', [UsersController::class, 'storePaymentMethod'])->name('store.payment.method');
 
 Route::get('/tipos-servicios', [TipoServicioController::class, 'index'])->name('tipos.servicios');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);

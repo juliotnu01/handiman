@@ -62,6 +62,8 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
         'has_all_verifications',
+        'has_approved_certifications',
+        'has_active_payment_methods',
     ];
 
     public function basicInformation()
@@ -77,6 +79,11 @@ class User extends Authenticatable
     public function certifications()
     {
         return $this->hasMany(Certification::class, 'user_id');
+    }
+    
+    public function paymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class, 'user_id');
     }
 
     /**
@@ -107,5 +114,53 @@ class User extends Authenticatable
             ->count() === count($requiredTypes);
 
         return $hasAllVerifications;
+    }
+
+    /**
+     * Definir el atributo personalizado `has_approved_certifications`.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function hasApprovedCertifications(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->checkApprovedCertifications(),
+        );
+    }
+
+    /**
+     * Método privado para verificar si el usuario tiene una o más certificaciones aprobadas.
+     *
+     * @return bool
+     */
+    private function checkApprovedCertifications(): bool
+    {
+        return $this->certifications()
+            ->where('is_verified', true)
+            ->exists();
+    }
+
+    /**
+     * Definir el atributo personalizado `has_active_payment_methods`.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function hasActivePaymentMethods(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->checkActivePaymentMethods(),
+        );
+    }
+
+    /**
+     * Método privado para verificar si el usuario tiene uno o más métodos de pago activos.
+     *
+     * @return bool
+     */
+    private function checkActivePaymentMethods(): bool
+    {
+        return $this->paymentMethods()
+            ->where('status', true)
+            ->exists();
     }
 }

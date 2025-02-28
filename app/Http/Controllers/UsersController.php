@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Certification;
+use App\Models\PaymentMethod;
 
 class UsersController extends Controller
 {
@@ -19,7 +20,7 @@ class UsersController extends Controller
         $search = $request->input('search');
         $searchBy = $request->input('search_by');
     
-        $query = User::with('certifications');
+        $query = User::with(['certifications', 'paymentMethods']);
     
         if ($search && $searchBy) {
             $query->where($searchBy, 'like', '%' . $search . '%');
@@ -75,6 +76,31 @@ class UsersController extends Controller
         Certification::insert($certifications);
 
         return response()->json(['message' => 'Certificados subidos con exito'], 200);
+    }
+
+    public function storePaymentMethod(Request $request)
+    {
+        $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'titular_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:20',
+            'id_titular' => 'required|string|max:20',
+            'type_account' => 'required|string|max:20',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $paymentMethod = new PaymentMethod([
+            'bank_name' => $request->input('bank_name'),
+            'titular_name' => $request->input('titular_name'),
+            'account_number' => $request->input('account_number'),
+            'id_titular' => $request->input('id_titular'),
+            'type_account' => $request->input('type_account'),
+            'user_id' => $request->input('user_id'),
+        ]);
+
+        $paymentMethod->save();
+
+        return response()->json(['message' => 'Método de pago registrado con éxito'], 200);
     }
 
     /**
