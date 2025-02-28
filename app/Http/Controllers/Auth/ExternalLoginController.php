@@ -16,7 +16,7 @@ class ExternalLoginController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $user = User::where('email', $request->email)->with(['basicInformation'])->first();
+            $user = User::where('email', $request->email)->with(['basicInformation', 'certifications'])->first();
             if ($user && Hash::check($request->password, $user->password)) {
                 return response()->json(["valid" => true, "user" => $user]);
             }

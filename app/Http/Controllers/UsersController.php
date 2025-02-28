@@ -19,7 +19,7 @@ class UsersController extends Controller
         $search = $request->input('search');
         $searchBy = $request->input('search_by');
     
-        $query = User::query();
+        $query = User::with('certifications');
     
         if ($search && $searchBy) {
             $query->where($searchBy, 'like', '%' . $search . '%');
@@ -53,21 +53,19 @@ class UsersController extends Controller
         $request->validate([
             'files.*' => 'required|mimes:pdf|max:2048',
             'user_id' => 'required|exists:users,id',
-            'description' => 'nullable|string',
         ]);
 
-        $user_id = $request->input('user_id');
-        $description = $request->input('description', '');
 
+        $user_id = $request->input('user_id');
         $certifications = [];
 
-        foreach ($request->file('files') as $file) {
+        foreach ($request->file('files') as $index =>  $file) {
             $path = $file->storeAs("public/certificados/users/{$user_id}", $file->getClientOriginalName());
 
             $certifications[] = [
                 'certification_name' => $file->getClientOriginalName(),
                 'certificatin_path' => Storage::url($path),
-                'description' => $description,
+                'description' => $request->input('descriptions')[$index] ?? null,
                 'user_id' => $user_id,
                 'created_at' => now(),
                 'updated_at' => now(),
