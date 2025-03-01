@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
         // Crear usuarios con información básica asociada
         User::factory(50)
             ->withBasicInformation()
+            ->withPaymentMethods(3)
+            ->withCertifications(3)
+            ->withVerificationIds(2)
             ->create();
     }
 }

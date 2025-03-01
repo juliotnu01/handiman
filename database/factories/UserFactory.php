@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
             'current_team_id' => null,
+            'mode' => $this->faker->numberBetween(0, 1),
         ];
     }
 
@@ -71,6 +72,28 @@ class UserFactory extends Factory
         return $this->has(
             \App\Models\BasicInformationUser::factory(),
             'basicInformation'
+        );
+    }
+
+    public function withPaymentMethods(int $count = 3): static
+    {
+        return $this->has(
+            \App\Models\PaymentMethod::factory()->count($count),
+            'paymentMethods'
+        );
+    }
+    public function withCertifications(int $count = 3): static
+    {
+        return $this->has(
+            \App\Models\Certification::factory()->count($count),
+            'certifications'
+        );
+    }
+    public function withVerificationIds(int $count = 2): static
+    {
+        return $this->has(
+            \App\Models\VerificationID::factory()->count($count),
+            'verificationIds'
         );
     }
 }
