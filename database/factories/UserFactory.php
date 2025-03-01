@@ -65,4 +65,12 @@ class UserFactory extends Factory
             'ownedTeams'
         );
     }
+
+    public function withBasicInformation()
+    {
+        return $this->has(
+            \App\Models\BasicInformationUser::factory(),
+            'basicInformation'
+        );
+    }
 }

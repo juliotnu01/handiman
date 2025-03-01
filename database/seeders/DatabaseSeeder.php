@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\BasicInformationUserSeeder;
-use Illuminate\Support\Facades\DB;
-
-
+use App\Models\User;
+use App\Models\TipoServicio;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,14 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // Crear registros para TipoServicio
+        TipoServicio::factory(10)->create();
 
-        \App\Models\TipoServicio::factory(10)->create();
-
-        \App\Models\User::factory(50)->create();
-        DB::table('basic_information_users')->truncate();
-        $this->call([
-            BasicInformationUserSeeder::class,
-        ]);
+        // Crear usuarios con información básica asociada
+        User::factory(50)
+            ->withBasicInformation()
+            ->create();
     }
 }
