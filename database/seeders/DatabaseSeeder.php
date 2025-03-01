@@ -14,9 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear registros para TipoServicio
-        TipoServicio::factory(10)->create();
-
         // Crear usuarios con información básica asociada
         User::factory(50)
             ->withBasicInformation()

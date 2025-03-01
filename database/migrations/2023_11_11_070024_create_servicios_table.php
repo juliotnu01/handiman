@@ -15,13 +15,12 @@ return new class extends Migration
             $table->id();
             $table->text('codigo')->nullable();
             $table->text('servicio')->nullable();
-            $table->string('tipo_servicio')->nullable(); 
             $table->string('ubicacion')->nullable();
             $table->string('coordenadas')->nullable();
             $table->boolean('status')->nullable();
             $table->float('precio', 8, 2)->nullable();
             $table->foreignId('usr_creador')->nullable()->constrained('users');
-            $table->foreignId('usr_solicitante')->nullable()->constrained('users');
+            $table->foreignId('usr_receptor')->nullable()->constrained('users');                
             $table->timestamps();
         });
     }
