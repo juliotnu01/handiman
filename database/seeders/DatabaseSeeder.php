@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ->withPaymentMethods(3)
             ->withCertifications(3)
             ->withVerificationIds(2)
+            ->withReviews()
             ->create();
     }
 }

@@ -64,6 +64,7 @@ class User extends Authenticatable
         'has_all_verifications',
         'has_approved_certifications',
         'has_active_payment_methods',
+        'review_stats', // Añadimos el nuevo atributo
     ];
 
     public function basicInformation()
@@ -84,6 +85,11 @@ class User extends Authenticatable
     public function paymentMethods()
     {
         return $this->hasMany(PaymentMethod::class, 'user_id');
+    }
+
+    public function reviewUsers()
+    {
+        return $this->hasMany(ReviewUser::class);
     }
 
     /**
@@ -162,5 +168,34 @@ class User extends Authenticatable
         return $this->paymentMethods()
             ->where('status', true)
             ->exists();
+    }
+
+    /**
+     * Definir el atributo personalizado `review_stats`.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function reviewStats(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->calculateReviewStats(),
+        );
+    }
+
+    /**
+     * Método privado para calcular las estadísticas de reviews.
+     *
+     * @return object
+     */
+    private function calculateReviewStats(): object
+    {
+        $reviews = $this->reviewUsers();
+        $count = $reviews->count();
+        $average = $reviews->avg('score');
+
+        return (object) [
+            'count' => $count,
+            'average' => $average,
+        ];
     }
 }

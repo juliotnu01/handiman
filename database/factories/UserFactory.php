@@ -57,8 +57,8 @@ class UserFactory extends Factory
 
         return $this->has(
             Team::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name.'\'s Team',
+                ->state(fn(array $attributes, User $user) => [
+                    'name' => $user->name . '\'s Team',
                     'user_id' => $user->id,
                     'personal_team' => true,
                 ])
@@ -94,6 +94,18 @@ class UserFactory extends Factory
         return $this->has(
             \App\Models\VerificationID::factory()->count($count),
             'verificationIds'
+        );
+    }
+    /**
+     * Indicate that the model should have reviews.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function withReviews()
+    {
+        return $this->has(
+            \App\Models\ReviewUser::factory()->count(rand(1, 10000)),
+            'reviewUsers'
         );
     }
 }
