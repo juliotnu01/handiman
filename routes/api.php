@@ -6,6 +6,7 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\Auth\ExternalLoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VerificationIDController;
+use App\Http\Controllers\ReviewsUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,10 +28,8 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::post('/store', [ServicioController::class, 'store']);
 });
 
-
-
 Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('verify.user');
 Route::post('/upload-certificates', [UsersController::class, 'storeCertications'])->name('upload.certificates.user');
 Route::post('/store-payment-method', [UsersController::class, 'storePaymentMethod'])->name('store.payment.method');
-
+Route::get('/reviews/paginated/{userId}', [ReviewsUserController::class, 'getPaginatedReviewsByUser'])->name('reviews.paginated.user');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('score_comment')->nullable();
             $table->boolean('like_dislike')->nullable();           
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade'); // Nuevo campo agregado
             $table->timestamps();
         });
     }
