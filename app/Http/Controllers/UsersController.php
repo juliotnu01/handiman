@@ -176,6 +176,26 @@ class UsersController extends Controller
         }
     }
 
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'avatar' => 'required|image|mimes:jpg,png|max:2048',
+        ]);
+
+        try {
+            $user = User::findOrFail($request->input('user_id'));
+
+            if ($request->hasFile('avatar')) {
+                $user->updateProfilePhoto($request->file('avatar'));
+            }
+
+            return response()->json(['message' => 'Avatar actualizado con éxito'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar el avatar', 'details' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Display the specified resource.
      */

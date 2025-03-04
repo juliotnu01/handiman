@@ -27,6 +27,9 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::get('/', [ServicioController::class, 'index']);
     Route::post('/store', [ServicioController::class, 'store']);
 });
+
+
+Route::post('/update-avatar', [UsersController::class, 'updateAvatar'])->name('update.avatar');
 Route::get('/user-basic-information/{id}', [UsersController::class, 'getUserWithBasicInformation'])->name('user.basic.information');
 Route::post('/store-basic-information', [UsersController::class, 'storeBasicInformation'])->name('store.basic.information');
 Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('verify.user');
