@@ -11,7 +11,8 @@ services:
         volumes:
             - .:/var/www/html
         ports:
-            - "8080:80" # Exponemos el puerto 8080 para acceder a la aplicación
+            - "8000:80"  # Puerto de la aplicación Laravel
+            - "5173:5173" # Puerto de Vite para HMR
         networks:
             - laravel-network
         depends_on:
@@ -30,7 +31,7 @@ services:
         volumes:
             - db-data:/var/lib/mysql
         ports:
-            - "3306:3306" # Exponemos el puerto 3306 para acceder a la base de datos
+            - "3306:3306"
         networks:
             - laravel-network
 
@@ -39,7 +40,7 @@ services:
         container_name: laravel-redis
         restart: unless-stopped
         ports:
-            - "6379:6379" # Exponemos el puerto 6379 para Redis
+            - "6379:6379"
         networks:
             - laravel-network
 
@@ -48,8 +49,8 @@ services:
         container_name: laravel-mailpit
         restart: unless-stopped
         ports:
-            - "1025:1025" # Puerto SMTP
-            - "8025:8025" # Interfaz web de Mailpit
+            - "1025:1025"
+            - "8025:8025"
         networks:
             - laravel-network
 

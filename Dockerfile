@@ -27,13 +27,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 # Configuramos el directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiamos los archivos de la aplicación
+# Copiamos los archivos de la aplicación EXCEPTO node_modules
 COPY . .
 
 # Instalamos las dependencias de Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Instalamos las dependencias de Node.js
+# Instalamos las dependencias de Node.js DENTRO DEL CONTENEDOR
 RUN npm install && npm run build
 
 # Habilitamos el módulo rewrite de Apache
@@ -44,3 +44,10 @@ COPY docker/apache/vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Reiniciamos Apache
 RUN service apache2 restart
+
+# Copiamos el script de entrada
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Ejecutamos el script como punto de entrada
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

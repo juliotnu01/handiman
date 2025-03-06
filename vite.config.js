@@ -5,8 +5,8 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.js',
-            refresh: true,
+            input: ['resources/css/app.css', 'resources/js/app.js'], // Añade múltiples puntos de entrada si es necesario
+            refresh: true, // Habilita la recarga automática
         }),
         vue({
             template: {
@@ -17,4 +17,11 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        host: '0.0.0.0', // Permite acceso desde fuera del contenedor
+        port: 5173,      // Puerto predeterminado de Vite
+        hmr: {
+            host: 'localhost', // Host para HMR
+        },
+    },
 });
