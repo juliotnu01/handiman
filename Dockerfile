@@ -45,9 +45,3 @@ COPY docker/apache/vhost.conf /etc/apache2/sites-available/000-default.conf
 # Reiniciamos Apache
 RUN service apache2 restart
 
-# Copiamos el script de entrada
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Ejecutamos el script como punto de entrada
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
