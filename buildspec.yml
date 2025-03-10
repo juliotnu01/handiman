@@ -2,17 +2,16 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "us-east-2"
-    ECR_REGISTRY: "545009837147.dkr.ecr.us-east-2.amazonaws.com"
 phases:
   pre_build:
     commands:
       - echo "Logging into ECR..."
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin  545009837147.dkr.ecr.us-east-2.amazonaws.com
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t $ECR_REGISTRY/laravel-app:latest -f Dockerfile .
+      - docker build -t 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest -f Dockerfile .
   post_build:
     commands:
       - echo "Pushing Docker image..."
-      - docker push $ECR_REGISTRY/laravel-app:latest
+      - docker push 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest
