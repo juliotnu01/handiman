@@ -5,6 +5,11 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: laravel-app
+  MyKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: mi-llave-ec2 
+      PublicKeyMaterial: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILz9f+Qwsl4LArAINi8uyx99QSJ0vK5Vt1t5AMUho4Uu nunezjuliot@gmail.com
 
   # Instancia EC2 con Docker preinstalado
   MyEC2Instance:
@@ -72,4 +77,12 @@ Resources:
                   - ecr:*
                   - s3:*
                   - ec2:*
+                Resource: "*"
+        - PolicyName: CloudFormationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:*
                 Resource: "*"

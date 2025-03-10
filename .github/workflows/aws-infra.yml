@@ -24,7 +24,12 @@ jobs:
           aws cloudformation deploy \
             --template-file infra.yml \
             --stack-name laravel-stack \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset # Evita errores si no hay cambios
+        # Agrega manejo de errores
+        shell: bash
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       # 4. Construir y subir imagen a ECR
       - name: Build and Push Docker Image
