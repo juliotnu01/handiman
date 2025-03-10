@@ -77,8 +77,6 @@ Resources:
                   - ecr:*
                   - s3:*
                   - ec2:*
-                  - ssm:GetParameters # Agrega este permiso
-                  - ssm:GetParameter # Y este si es necesario
                 Resource: "*"
         - PolicyName: CloudFormationAccess
           PolicyDocument:
