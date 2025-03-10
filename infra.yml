@@ -1,23 +1,25 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
-  # Repositorio ECR para Docker
+  # Repositorio ECR
   MyECRRepo:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: laravel-app
+
+  # Key Pair (requiere creación manual previa)
   MyKeyPair:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: mi-llave-ec2 
+      KeyName: KeypairGithub-2025
       PublicKeyMaterial: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILz9f+Qwsl4LArAINi8uyx99QSJ0vK5Vt1t5AMUho4Uu nunezjuliot@gmail.com
 
-  # Instancia EC2 con Docker preinstalado
+  # Instancia EC2
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-0c02fb55956c7d316 # Ubuntu 22.04
       InstanceType: t2.micro
-      KeyName: mi-llave-ec2 # Se creará automáticamente
+      KeyName: !Ref MyKeyPair
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
       UserData:
@@ -26,7 +28,8 @@ Resources:
           apt update
           apt install -y docker.io docker-compose
           usermod -aG docker ubuntu
-          systemctl enable docker
+          newgrp docker
+          systemctl enable --now docker
 
   # Base de datos RDS (MySQL)
   MyRDSInstance:
@@ -34,18 +37,20 @@ Resources:
     Properties:
       DBInstanceIdentifier: laravel-db
       MasterUsername: admin
-      MasterUserPassword: password
+      MasterUserPassword: '{{resolve:ssm:/laravel/db/password}}' # Usar SSM Parameter Store
       DBName: laravel
       Engine: mysql
       DBInstanceClass: db.t2.micro
       AllocatedStorage: 20
-      PubliclyAccessible: true
+      PubliclyAccessible: false # Desactivar acceso público
+      VPCSecurityGroups:
+        - !GetAtt RDSSecurityGroup.GroupId
 
-  # Grupos de seguridad
+  # Security Groups
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Acceso a EC2
+      GroupDescription: Acceso HTTP/SSH a EC2
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -56,7 +61,17 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  # Roles y políticas de IAM
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Acceso RDS desde EC2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+
+  # Rol para CodeBuild
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -77,6 +92,7 @@ Resources:
                   - ecr:*
                   - s3:*
                   - ec2:*
+                  - ssm:GetParameter
                 Resource: "*"
         - PolicyName: CloudFormationAccess
           PolicyDocument:
@@ -86,3 +102,11 @@ Resources:
                 Action:
                   - cloudformation:*
                 Resource: "*"
+
+Outputs:
+  EC2PublicIP:
+    Description: IP pública de EC2
+    Value: !GetAtt MyEC2Instance.PublicIp
+  RDSEndpoint:
+    Description: Endpoint de RDS
+    Value: !GetAtt MyRDSInstance.Endpoint.Address

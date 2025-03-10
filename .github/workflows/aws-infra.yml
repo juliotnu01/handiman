@@ -11,42 +11,48 @@ jobs:
       # 1. Checkout del código
       - uses: actions/checkout@v4
 
-      # 2. Configurar credenciales de AWS
+      # 2. Configurar AWS Credentials
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3. Crear infraestructura con CloudFormation
+      # 3. Desplegar infraestructura con CloudFormation
       - name: Deploy CloudFormation
         run: |
           aws cloudformation deploy \
             --template-file infra.yml \
             --stack-name laravel-stack \
             --capabilities CAPABILITY_NAMED_IAM \
-            --no-fail-on-empty-changeset # Evita errores si no hay cambios
-        # Agrega manejo de errores
-        shell: bash
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+            --no-fail-on-empty-changeset
 
-      # 4. Construir y subir imagen a ECR
+      # 4. Obtener IP de EC2 y Endpoint de RDS
+      - name: Obtener metadatos de CloudFormation
+        id: cfn_outputs
+        run: |
+          EC2_IP=$(aws cloudformation describe-stacks --stack-name laravel-stack --query "Stacks[0].Outputs[?OutputKey=='EC2PublicIP'].OutputValue" --output text)
+          RDS_ENDPOINT=$(aws cloudformation describe-stacks --stack-name laravel-stack --query "Stacks[0].Outputs[?OutputKey=='RDSEndpoint'].OutputValue" --output text)
+          echo "EC2_PUBLIC_IP=$EC2_IP" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
+
+      # 5. Construir y subir imagen a ECR
       - name: Build and Push Docker Image
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
           docker build -t $ECR_REGISTRY/laravel-app:latest -f Dockerfile .
           docker push $ECR_REGISTRY/laravel-app:latest
-        env:
-          ECR_REGISTRY: 545009837147.dkr.ecr.us-east-2.amazonaws.com
 
-      # 5. Desplegar en EC2 via SSH
+      # 6. Desplegar en EC2 via SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.7
         with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
+          host: ${{ env.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
+            export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
+            export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
             docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d 
+            docker-compose -f docker-compose.yml up -d
