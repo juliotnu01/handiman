@@ -2,7 +2,7 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "us-east-2"
-    ECR_REGISTRY: "545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app"
+    ECR_REGISTRY: "545009837147.dkr.ecr.us-east-2.amazonaws.com"
 phases:
   pre_build:
     commands:
@@ -11,7 +11,7 @@ phases:
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t $ECR_REGISTRY/laravel-app:latest -f Dockerfile.prod .
+      - docker build -t $ECR_REGISTRY/laravel-app:latest -f Dockerfile .
   post_build:
     commands:
       - echo "Pushing Docker image..."
