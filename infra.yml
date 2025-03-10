@@ -83,6 +83,11 @@ Resources:
           ToPort: 6379
           SourceSecurityGroupId: !Ref EC2SecurityGroup
 
+  MyECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+    RepositoryName: laravel-app
+
 Outputs:
   EC2PublicIP:
     Description: Public IP of EC2 instance
