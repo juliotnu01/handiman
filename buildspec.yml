@@ -1,8 +1,9 @@
 version: 0.2
+env:
+  variables:
+    AWS_REGION: "us-east-2"
+    ECR_REGISTRY: "545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app"
 phases:
-  install:
-    commands:
-      - echo "Instalando dependencias..."
   pre_build:
     commands:
       - echo "Logging into ECR..."
@@ -13,5 +14,5 @@ phases:
       - docker build -t $ECR_REGISTRY/laravel-app:latest -f Dockerfile.prod .
   post_build:
     commands:
-      - echo "Pushing Docker image to ECR..."
+      - echo "Pushing Docker image..."
       - docker push $ECR_REGISTRY/laravel-app:latest
