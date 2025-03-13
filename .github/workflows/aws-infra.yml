@@ -21,7 +21,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3. Desplegar infraestructura con CloudFormation
+      # 3. Verificar credenciales de AWS
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
+      # 4. Desplegar infraestructura con CloudFormation
       - name: Deploy CloudFormation
         run: |
           aws cloudformation deploy \
@@ -30,7 +34,7 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset
 
-      # 4. Obtener IP de EC2 y Endpoint de RDS
+      # 5. Obtener IP de EC2 y Endpoint de RDS
       - name: Get EC2 Public IP and RDS Endpoint
         id: cfn_outputs
         run: |
@@ -39,17 +43,16 @@ jobs:
           echo "EC2_PUBLIC_IP=$EC2_IP" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
-      # 5. Construir y subir imagen a ECR
+      # 6. Autenticar en ECR y subir imagen
       - name: Build and Push Docker Image
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
-          docker build -t ${{ secrets.ECR_REGISTRY }}:$IMAGE_TAG -f Dockerfile .
-          docker push ${{ secrets.ECR_REGISTRY }}:$IMAGE_TAG
+          docker build -t ${{ secrets.ECR_REGISTRY }}:lastest -f Dockerfile .
+          docker push ${{ secrets.ECR_REGISTRY }}:lastest
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-      # 6. Desplegar en EC2 via SSH
-      # 6. Desplegar en EC2 via SSH
+      # 7. Desplegar en EC2 via SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -58,25 +61,23 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Actualizar el sistema e instalar Docker (Amazon Linux 2023)
             sudo dnf update -y
             sudo dnf install docker -y
             sudo systemctl start docker
             sudo systemctl enable docker
             sudo usermod -aG docker ec2-user
 
-            # Instalar Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-
-            # Instalar bibliotecas adicionales
+            # Instalar bibliotecas necesarias
             sudo dnf install -y libxcrypt-compat
 
-            # Descargar el archivo docker-compose.yml desde GitHub
-            curl -LJO https://github.com/juliotnu01/handiman/blob/main/docker-compose.yml
+            # Descargar docker-compose.yml desde GitHub
+            curl -LJO https://raw.githubusercontent.com/juliotnu01/handiman/main/docker-compose.yml
 
-            # Verificar el contenido del archivo descargado
+            # Verificar contenido del archivo
             cat docker-compose.yml
+
+            # Validar sintaxis del archivo YAML
+            docker-compose -f docker-compose.yml config
 
             # Exportar variables de entorno
             export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
@@ -84,9 +85,9 @@ jobs:
             export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
 
             # Descargar y ejecutar la imagen Docker
-            docker pull ${{ secrets.ECR_REGISTRY }}:${{ env.IMAGE_TAG }}
+            docker pull ${{ secrets.ECR_REGISTRY }}:lastest
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
 
-            # Reiniciar la instancia para aplicar cambios de grupo
+            # Reiniciar la instancia para aplicar cambios
             sudo reboot
