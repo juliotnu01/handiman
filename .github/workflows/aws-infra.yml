@@ -61,14 +61,14 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo dnf update -y
-            sudo dnf install docker -y
-            sudo systemctl start docker
-            sudo systemctl enable docker
-            sudo usermod -aG docker ec2-user
+            # sudo dnf update -y
+            # sudo dnf install docker -y
+            # sudo systemctl start docker
+            # sudo systemctl enable docker
+            # sudo usermod -aG docker ec2-user
 
             # Instalar bibliotecas necesarias
-            sudo dnf install -y libxcrypt-compat
+            # sudo dnf install -y libxcrypt-compat
 
             # Descargar docker-compose.yml desde GitHub
             curl -LJO https://raw.githubusercontent.com/juliotnu01/handiman/main/docker-compose.yml
