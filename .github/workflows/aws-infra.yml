@@ -64,10 +64,10 @@ jobs:
             set -e # Detener el script si un comando falla
 
             # Autenticación con ECR
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 545009837147.dkr.ecr.us-east-2.amazonaws.com
 
             # Descargar la imagen Docker
-            docker pull ${{ secrets.ECR_REGISTRY }}:latest
+            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
 
             # Detener y eliminar contenedores existentes (si los hay)
             docker-compose -f docker-compose.yml down
