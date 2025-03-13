@@ -73,7 +73,7 @@ jobs:
             sudo dnf install -y libxcrypt-compat
 
             # Descargar el archivo docker-compose.yml desde GitHub
-            curl -LJO https://raw.githubusercontent.com/<tu-usuario>/<tu-repositorio>/main/docker-compose.yml
+            curl -LJO https://github.com/juliotnu01/handiman/blob/main/docker-compose.yml
 
             # Verificar el contenido del archivo descargado
             cat docker-compose.yml
