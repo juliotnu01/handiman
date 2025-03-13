@@ -37,7 +37,7 @@ jobs:
           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
       # 5. Construir y subir imagen a ECR
-      - name: Build and Push Docker Image 
+      - name: Build and Push Docker Image
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
