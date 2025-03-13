@@ -85,7 +85,7 @@ jobs:
             export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
 
             # Descargar y ejecutar la imagen Docker
-            docker pull ${{ secrets.ECR_REGISTRY }}:latest
+            docker pull ${{ secrets.ECR_REGISTRY }}:lastest
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
 
