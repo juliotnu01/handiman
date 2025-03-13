@@ -47,16 +47,15 @@ jobs:
 
       # 6. Desplegar en EC2 via SSH
       - name: Deploy to EC2
-        run: |
-          chmod 600 ssh_key.pem
-          scp -i ssh_key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/
-          ssh -i ssh_key.pem -o StrictHostKeyChecking=no ec2-user@${{ env.EC2_PUBLIC_IP }} << 'EOF'
-          export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
-          export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
-          export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
-          docker pull ${{ secrets.ECR_REGISTRY }}/laravel-app:${{ env.IMAGE_TAG }}
-          docker-compose -f docker-compose.yml down
-          docker-compose -f docker-compose.yml up -d
-          EOF
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.EC2_PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
+            export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
+            export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
+            docker pull ${{ secrets.ECR_REGISTRY }}/laravel-app:${{ env.IMAGE_TAG }}
+            docker-compose -f docker-compose.yml down
+            docker-compose -f docker-compose.yml up -d
