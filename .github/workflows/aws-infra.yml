@@ -73,17 +73,20 @@ jobs:
             which docker || echo "Docker is not installed"
             docker --version || echo "Docker command not found"
 
-            # Instalar AWS CLI
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            # Instalar pip para Python 3.12
+            sudo yum install -y python3-pip
+
+            # Verificar la versión de Python
+            python3 --version || echo "Python3 is not installed"
 
             # Instalar la biblioteca libcrypt
             sudo yum install -y libxcrypt-compat
 
-            # Instalar Python 3.7
-            sudo yum install -y python3.7
-            sudo ln -s /usr/bin/python3.7 /usr/bin/python3
+            # Descargar el archivo docker-compose.yml desde GitHub
+            curl -LJO https://raw.githubusercontent.com/<tu-usuario>/<tu-repositorio>/main/docker-compose.yml
+
+            # Verificar que el archivo exista
+            ls -l ./docker-compose.yml || echo "docker-compose.yml not found"
 
             # Reiniciar sesión para aplicar cambios del grupo docker
             echo "Please reconnect to the instance to apply group changes"
