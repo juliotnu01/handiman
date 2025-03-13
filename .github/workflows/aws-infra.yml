@@ -47,11 +47,12 @@ jobs:
 
       # 6. Desplegar en EC2 via SSH
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.EC2_PUBLIC_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
             export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
