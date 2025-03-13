@@ -61,33 +61,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # sudo dnf update -y
-            # sudo dnf install docker -y
-            # sudo systemctl start docker
-            # sudo systemctl enable docker
-            # sudo usermod -aG docker ec2-user
+            set -e # Detener el script si un comando falla
 
-            # Instalar bibliotecas necesarias
-            # sudo dnf install -y libxcrypt-compat
+            # Autenticación con ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-            # Descargar docker-compose.yml desde GitHub
-            curl -LJO https://raw.githubusercontent.com/juliotnu01/handiman/main/docker-compose.yml
+            # Descargar la imagen Docker
+            docker pull ${{ secrets.ECR_REGISTRY }}:latest
 
-            # Verificar contenido del archivo
-            cat docker-compose.yml
-
-            # Validar sintaxis del archivo YAML
-            docker-compose -f docker-compose.yml config
-
-            # Exportar variables de entorno
-            export RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }}
-            export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
-            export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
-
-            # Descargar y ejecutar la imagen Docker
-            docker pull ${{ secrets.ECR_REGISTRY }}:lastest
+            # Detener y eliminar contenedores existentes (si los hay)
             docker-compose -f docker-compose.yml down
-            docker-compose -f docker-compose.yml up -d
 
-            # Reiniciar la instancia para aplicar cambios
-            sudo reboot
+            # Crear/actualizar contenedores con docker-compose
+            docker-compose -f docker-compose.yml up -d
