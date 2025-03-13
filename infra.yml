@@ -1,11 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Resources:
-  MyECRRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: handiman-app
-    DeletionPolicy: Retain
-
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -37,14 +31,15 @@ Resources:
     DependsOn:
       - EC2SecurityGroup
     Properties:
-      ImageId: ami-0d0f28110d16ee7d6
+      ImageId: ami-0d0f28110d16ee7d6 # AMI de Amazon Linux 2
       InstanceType: t2.micro
       KeyName: KeypairGithub
-      SecurityGroupIds: # Cambiado a SecurityGroupIds
-        - !GetAtt EC2SecurityGroup.GroupId # El valor debe ser una lista
+      SecurityGroupIds:
+        - !GetAtt EC2SecurityGroup.GroupId
       UserData:
         Fn::Base64: |
           #!/bin/bash
+          yum update -y
           amazon-linux-extras install docker -y
           service docker start
           usermod -aG docker ec2-user
@@ -66,53 +61,15 @@ Resources:
       EngineVersion: "5.7.44"
       DBInstanceClass: db.t3.micro
       AllocatedStorage: 20
-      PubliclyAccessible: false
+      PubliclyAccessible: true
       VPCSecurityGroups:
         - !GetAtt RDSSecurityGroup.GroupId
     DeletionPolicy: Snapshot
-
-  CodeBuildRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - codebuild.amazonaws.com
-                - cloudformation.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: ECRFullAccess
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecr:CreateRepository
-                  - ecr:GetAuthorizationToken
-                  - ecr:InitiateLayerUpload
-                  - ecr:UploadLayerPart
-                  - ecr:CompleteLayerUpload
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:PutImage
-                Resource: "*"
-        - PolicyName: S3Access
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:PutObject
-                Resource: "arn:aws:s3:::mi-bucket-handiman/*"
-        - PolicyName: SSMReadOnly
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ssm:GetParameter
-                Resource: "arn:aws:ssm:us-east-2:545009837147:parameter/laravel/db/password"
-    DeletionPolicy: Retain
+    
+Outputs:
+  MyEC2InstancePublicIP:
+    Description: "Public IP address of the EC2 instance"
+    Value: !GetAtt MyEC2Instance.PublicIp
+  RDSEndpoint:
+    Description: "Endpoint of the RDS instance"
+    Value: !GetAtt MyRDSInstance.Endpoint.Address

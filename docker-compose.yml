@@ -2,34 +2,34 @@ version: "3.8"
 
 services:
     app:
-        image: 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest
-        container_name: laravel-app
-        restart: unless-stopped
-        working_dir: /var/www/html
-        volumes:
-            - .:/var/www/html
-        ports:
-            - "8000:80" # Puerto de la aplicación Laravel
-            - "5173:5173" # Puerto de Vite para HMR
-        networks:
-            - laravel-network
-        depends_on:
-            - db
-        # build:
-        #     context: .
-        #     dockerfile: Dockerfile
+        # image: 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest
         # container_name: laravel-app
         # restart: unless-stopped
         # working_dir: /var/www/html
         # volumes:
         #     - .:/var/www/html
         # ports:
-        #     - "8000:80"  # Puerto de la aplicación Laravel
+        #     - "8000:80" # Puerto de la aplicación Laravel
         #     - "5173:5173" # Puerto de Vite para HMR
         # networks:
         #     - laravel-network
         # depends_on:
         #     - db
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - .:/var/www/html
+        ports:
+            - "8000:80"  # Puerto de la aplicación Laravel
+            - "5173:5173" # Puerto de Vite para HMR
+        networks:
+            - laravel-network
+        depends_on:
+            - db
     db:
         image: mysql:8.0
         container_name: laravel-db
