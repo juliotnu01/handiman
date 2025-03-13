@@ -39,10 +39,17 @@ jobs:
       # 5. Construir y subir imagen a ECR
       - name: Build and Push Docker Image
         run: |
+          # Autenticarse en ECR
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+          # Construir y etiquetar la imagen Docker
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
           docker build -t ${{ secrets.ECR_REGISTRY }}/laravel-app:$IMAGE_TAG -f Dockerfile .
+
+          # Subir la imagen a ECR
           docker push ${{ secrets.ECR_REGISTRY }}/laravel-app:$IMAGE_TAG
+
+          # Guardar el tag de la imagen como variable de entorno
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # 6. Desplegar en EC2 via SSH
