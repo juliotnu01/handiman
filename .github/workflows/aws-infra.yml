@@ -49,6 +49,7 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # 6. Desplegar en EC2 via SSH
+      # 6. Desplegar en EC2 via SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -89,4 +90,3 @@ jobs:
 
             # Reiniciar la instancia para aplicar cambios de grupo
             sudo reboot
-            docker-compose -f docker-compose.yml up -d
