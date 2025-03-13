@@ -2,48 +2,49 @@ version: "3.8"
 
 services:
     app:
-        build:
-            context: .
-            dockerfile: Dockerfile
+        image: 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest
         container_name: laravel-app
         restart: unless-stopped
         working_dir: /var/www/html
         volumes:
             - .:/var/www/html
         ports:
-            - "8000:80"  # Puerto de la aplicación Laravel
+            - "8000:80" # Puerto de la aplicación Laravel
             - "5173:5173" # Puerto de Vite para HMR
         networks:
             - laravel-network
         depends_on:
             - db
-            - redis
-
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile
+        # container_name: laravel-app
+        # restart: unless-stopped
+        # working_dir: /var/www/html
+        # volumes:
+        #     - .:/var/www/html
+        # ports:
+        #     - "8000:80"  # Puerto de la aplicación Laravel
+        #     - "5173:5173" # Puerto de Vite para HMR
+        # networks:
+        #     - laravel-network
+        # depends_on:
+        #     - db
     db:
         image: mysql:8.0
         container_name: laravel-db
         restart: unless-stopped
         environment:
-            MYSQL_DATABASE: laravel
-            MYSQL_ROOT_PASSWORD: secret
-            MYSQL_USER: laravel
-            MYSQL_PASSWORD: secret
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
         volumes:
             - db-data:/var/lib/mysql
         ports:
             - "3306:3306"
         networks:
             - laravel-network
-
-    redis:
-        image: redis:7.0
-        container_name: laravel-redis
-        restart: unless-stopped
-        ports:
-            - "6379:6379"
-        networks:
-            - laravel-network
-
     mailpit:
         image: axllent/mailpit
         container_name: laravel-mailpit

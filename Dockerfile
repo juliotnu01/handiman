@@ -44,4 +44,3 @@ COPY docker/apache/vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Reiniciamos Apache
 RUN service apache2 restart
-
