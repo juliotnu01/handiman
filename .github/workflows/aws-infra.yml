@@ -53,17 +53,43 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # 6. Desplegar en EC2 via SSH
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ env.EC2_PUBLIC_IP }}
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
-            export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
-            export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
-            docker pull ${{ secrets.ECR_REGISTRY }}/laravel-app:${{ env.IMAGE_TAG }}
-            docker-compose -f docker-compose.yml down
-            docker-compose -f docker-compose.yml up -d
+      -   name: Deploy to EC2
+          uses: appleboy/ssh-action@v1.2.2
+          with:
+            host: ${{ env.EC2_PUBLIC_IP }}
+            username: ec2-user
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            port: 22
+            script: |
+              # Actualizar el sistema
+              sudo yum update -y
+
+              # Instalar Docker
+              sudo amazon-linux-extras install docker -y
+              sudo service docker start
+              sudo usermod -aG docker ec2-user
+
+              # Instalar AWS CLI
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+
+              # Instalar la biblioteca libcrypt
+              sudo yum install -y libcrypt
+
+              # Reiniciar sesión para aplicar cambios del grupo docker
+              newgrp docker
+
+              # Verificar que Docker y AWS CLI estén instalados
+              docker --version
+              aws --version
+
+              # Exportar variables de entorno
+              export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
+              export DB_PASSWORD=$(aws ssm get-parameter --name /laravel/db/password --with-decryption --query Parameter.Value --output text)
+              export APP_KEY=$(aws ssm get-parameter --name /laravel/app/key --query Parameter.Value --output text)
+
+              # Descargar y ejecutar la imagen Docker
+              docker pull ${{ secrets.ECR_REGISTRY }}:${{ env.IMAGE_TAG }}
+              docker-compose -f docker-compose.yml down
+              docker-compose -f docker-compose.yml up -d
