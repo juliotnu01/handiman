@@ -60,7 +60,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "."  # ← Copia TODO el contenido del repositorio [[5]]
+          source: "." 
           target: "/home/ec2-user/"
           exclude: ".git/,node_modules/,vendor/"
 
@@ -74,32 +74,6 @@ jobs:
           port: 22
           script: |
             set -e
-
-            # Limpiar espacio antes del despliegue
-            echo "Limpiando espacio en disco..."
-            docker system prune -a --volumes -f  # Elimina todo lo no usado [[8]]
-            sudo rm -rf /var/lib/docker/tmp/*    # Borra cachés temporales
-
-            # 1. Instalar Apache (httpd) en Amazon Linux 2023
-            echo "Instalando Apache..."
-            sudo dnf install httpd -y  # [[2]][[6]]
-
-            # 2. Crear directorios automáticamente (Apache los crea, pero verificamos)
-            echo "Verificando directorios..."
-            sudo mkdir -p /var/www/html  # Solo por seguridad [[8]]
-            sudo chown -R ec2-user:ec2-user /var/www/html  # Permisos para el usuario [[8]]
-
-            # 3. Iniciar Apache y habilitarlo en el arranque
-            echo "Iniciando Apache..."
-            sudo systemctl enable httpd
-            sudo systemctl restart httpd
-
-            # 4. Verificar estado de Apache
-            echo "Estado de Apache:"
-            sudo systemctl status httpd --no-pager
-
-            # 5. Continuar con Docker (si es necesario)
-            echo "Desplegando contenedores..."
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
-            docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
