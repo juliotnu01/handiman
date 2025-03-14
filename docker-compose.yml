@@ -9,7 +9,7 @@ services:
         restart: unless-stopped
         working_dir: /var/www/html
         volumes:
-            - .:/var/www/html
+            # - .:/var/www/html
             - /var/www/html:/var/www/html
         ports:
             - "8000:80" # Puerto de la aplicación Laravel
