@@ -74,6 +74,11 @@ jobs:
           script: |
             set -e
 
+            # Limpiar espacio antes del despliegue
+            echo "Limpiando espacio en disco..."
+            docker system prune -a --volumes -f  # Elimina todo lo no usado [[8]]
+            sudo rm -rf /var/lib/docker/tmp/*    # Borra cachés temporales
+
             # 1. Instalar Apache (httpd) en Amazon Linux 2023
             echo "Instalando Apache..."
             sudo dnf install httpd -y  # [[2]][[6]]
