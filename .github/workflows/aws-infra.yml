@@ -94,6 +94,6 @@ jobs:
 
             # 5. Continuar con Docker (si es necesario)
             echo "Desplegando contenedores..."
-            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:${IMAGE_TAG}
+            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
