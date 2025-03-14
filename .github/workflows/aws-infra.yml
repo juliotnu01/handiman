@@ -76,27 +76,27 @@ jobs:
             set -e
 
             # Limpiar espacio antes del despliegue
-            echo "Limpiando espacio en disco..."
-            docker system prune -a --volumes -f  # Elimina todo lo no usado [[8]]
-            sudo rm -rf /var/lib/docker/tmp/*    # Borra cachés temporales
+            # echo "Limpiando espacio en disco..."
+            # docker system prune -a --volumes -f  # Elimina todo lo no usado [[8]]
+            # sudo rm -rf /var/lib/docker/tmp/*    # Borra cachés temporales
 
             # 1. Instalar Apache (httpd) en Amazon Linux 2023
-            echo "Instalando Apache..."
-            sudo dnf install httpd -y  # [[2]][[6]]
+            # echo "Instalando Apache..."
+            # sudo dnf install httpd -y  # [[2]][[6]]
 
             # 2. Crear directorios automáticamente (Apache los crea, pero verificamos)
-            echo "Verificando directorios..."
-            sudo mkdir -p /var/www/html  # Solo por seguridad [[8]]
-            sudo chown -R ec2-user:ec2-user /var/www/html  # Permisos para el usuario [[8]]
+            # echo "Verificando directorios..."
+            # sudo mkdir -p /var/www/html  # Solo por seguridad [[8]]
+            # sudo chown -R ec2-user:ec2-user /var/www/html  # Permisos para el usuario [[8]]
 
             # 3. Iniciar Apache y habilitarlo en el arranque
-            echo "Iniciando Apache..."
-            sudo systemctl enable httpd
-            sudo systemctl restart httpd
+            # echo "Iniciando Apache..."
+            # sudo systemctl enable httpd
+            # sudo systemctl restart httpd
 
             # 4. Verificar estado de Apache
-            echo "Estado de Apache:"
-            sudo systemctl status httpd --no-pager
+            # echo "Estado de Apache:"
+            # sudo systemctl status httpd --no-pager
 
             # 5. Continuar con Docker (si es necesario)
             echo "Desplegando contenedores..."
