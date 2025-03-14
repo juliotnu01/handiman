@@ -53,6 +53,17 @@ jobs:
       #     echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # 7. Desplegar en EC2 via SSH
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "docker-compose.yml"
+          target: "/home/ec2-user/"
+
+      # 8. Desplegar en EC2
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -61,16 +72,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            set -e # Detener el script si un comando falla
-
-            # Autenticación con ECR
+            set -e
+            # Autenticar con ECR usando IAM Role
             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 545009837147.dkr.ecr.us-east-2.amazonaws.com
-
-            # Descargar la imagen Docker
+            # Usar el tag correcto
             docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
-
-            # Detener y eliminar contenedores existentes (si los hay)
             docker-compose -f docker-compose.yml down
-
-            # Crear/actualizar contenedores con docker-compose
             docker-compose -f docker-compose.yml up -d
