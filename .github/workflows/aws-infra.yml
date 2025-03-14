@@ -60,10 +60,10 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "docker-compose.yml,Dockerfile"  # ← Clave: incluir Dockerfile
+          source: "docker-compose.yml,Dockerfile"
           target: "/home/ec2-user/"
 
-      # 7. Desplegar en EC2
+      # 8. Desplegar en EC2
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -73,6 +73,9 @@ jobs:
           port: 22
           script: |
             set -e
-            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:${IMAGE_TAG}
+            # Autenticar con ECR usando IAM Role
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 545009837147.dkr.ecr.us-east-2.amazonaws.com
+            # Usar el tag correcto
+            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
