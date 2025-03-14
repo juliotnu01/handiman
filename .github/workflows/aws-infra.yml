@@ -73,9 +73,27 @@ jobs:
           port: 22
           script: |
             set -e
-            # Autenticar con ECR usando IAM Role
-            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 545009837147.dkr.ecr.us-east-2.amazonaws.com
-            # Usar el tag correcto
-            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:lastest
+
+            # 1. Instalar Apache (httpd) en Amazon Linux 2023
+            echo "Instalando Apache..."
+            sudo dnf install httpd -y  # [[2]][[6]]
+
+            # 2. Crear directorios automáticamente (Apache los crea, pero verificamos)
+            echo "Verificando directorios..."
+            sudo mkdir -p /var/www/html  # Solo por seguridad [[8]]
+            sudo chown -R ec2-user:ec2-user /var/www/html  # Permisos para el usuario [[8]]
+
+            # 3. Iniciar Apache y habilitarlo en el arranque
+            echo "Iniciando Apache..."
+            sudo systemctl enable httpd
+            sudo systemctl restart httpd
+
+            # 4. Verificar estado de Apache
+            echo "Estado de Apache:"
+            sudo systemctl status httpd --no-pager
+
+            # 5. Continuar con Docker (si es necesario)
+            echo "Desplegando contenedores..."
+            docker pull 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:${IMAGE_TAG}
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d
