@@ -79,7 +79,21 @@ jobs:
               echo "Error: Container ID not found."
               exit 1
             fi
-            docker exec $CONTAINER_ID bash -c "cat > .env <<EOF APP_NAME=LaravelAPP_ENV=productionAPP_KEY=APP_DEBUG=falseAPP_URL=http://${{ env.EC2_PUBLIC_IP }}DB_CONNECTION=mysqlDB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}DB_PORT=3306DB_DATABASE=laravelDB_USERNAME=adminDB_PASSWORD=${{ secrets.DB_PASSWORD }}LOG_CHANNEL=stackLOG_LEVEL=error EOF"
+            docker exec $CONTAINER_ID bash -c "cat > .env <<EOF
+      APP_NAME=Laravel
+      APP_ENV=production
+      APP_KEY=
+      APP_DEBUG=false
+      APP_URL=http://${{ env.EC2_PUBLIC_IP }}
+      DB_CONNECTION=mysql
+      DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}
+      DB_PORT=3306
+      DB_DATABASE=laravel
+      DB_USERNAME=admin
+      DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+      LOG_CHANNEL=stack
+      LOG_LEVEL=error
+      EOF"
             docker exec $CONTAINER_ID chmod -R 755 storage
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
             docker exec $CONTAINER_ID composer install
