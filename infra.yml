@@ -82,9 +82,9 @@ Resources:
       DBName: laravel
       Engine: mysql
       EngineVersion: "8.0"  # Versión compatible con la capa gratuita
-      DBInstanceClass: db.t2.micro  # Clase de instancia compatible con la capa gratuita
+      DBInstanceClass: db.t4g.micro  # Clase de instancia compatible con la capa gratuita
       AllocatedStorage: 20  # Máximo de 20 GB para la capa gratuita
-      PubliclyAccessible: false  # Mejor práctica: desactiva el acceso público
+      PubliclyAccessible: true  # Mejor práctica: desactiva el acceso público
       VPCSecurityGroups:
         - !GetAtt RDSSecurityGroup.GroupId
     DeletionPolicy: Snapshot
