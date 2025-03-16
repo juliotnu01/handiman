@@ -78,6 +78,6 @@ jobs:
             #   sleep 5
             # done
             # # Se asume que la instancia EC2 tiene asignado un IAM Role con permisos para ECR.
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            #  aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:lastest
             docker-compose -f docker-compose-prod.yml up -d
