@@ -79,8 +79,7 @@ jobs:
               echo "Error: Container ID not found."
               exit 1
             fi
-            docker exec $CONTAINER_ID touch .env
-            docker exec $CONTAINER_ID bash -c "<<EOF
+            docker exec $CONTAINER_ID bash -c "cat > .env <<EOF
               APP_NAME=Laravel
               APP_ENV=production
               APP_KEY=
@@ -95,11 +94,12 @@ jobs:
               LOG_CHANNEL=stack
               LOG_LEVEL=error
             EOF"
+            docker exec $CONTAINER_ID apt-get update && apt-get install -y vim
             docker exec $CONTAINER_ID chmod -R 755 storage
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
-            docker exec $CONTAINER_ID composer install --no-interaction --optimize-autoloader
+            docker exec $CONTAINER_ID composer install
             docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build
-            docker exec $CONTAINER_ID php artisan key:generate 
+            docker exec $CONTAINER_ID php artisan key:generate
             sleep 10
-            docker exec $CONTAINER_ID php artisan migrate  
+            docker exec $CONTAINER_ID php artisan migrate
