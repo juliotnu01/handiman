@@ -85,6 +85,16 @@ jobs:
             docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build
             docker exec $CONTAINER_ID touch .env # Crea el archivo .env vacío
-            docker exec $CONTAINER_ID printf "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=http://${{ env.EC2_PUBLIC_IP }}\nDB_CONNECTION=mysql\nDB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}\nDB_PORT=3306\nDB_DATABASE=laravel\nDB_USERNAME=admin\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+            docker exec $CONTAINER_ID printf "APP_NAME=Laravel\n
+                                              APP_ENV=production\n
+                                              APP_KEY=\n
+                                              APP_DEBUG=false\n
+                                              APP_URL=http://${{ env.EC2_PUBLIC_IP }}\n
+                                              DB_CONNECTION=mysql\n
+                                              DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}\n
+                                              DB_PORT=3306\n
+                                              DB_DATABASE=laravel\n
+                                              DB_USERNAME=admin\n
+                                              DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             docker exec $CONTAINER_ID php artisan key:generate --force
             docker exec $CONTAINER_ID php artisan migrate --force
