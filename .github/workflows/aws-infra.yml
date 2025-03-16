@@ -145,7 +145,7 @@ jobs:
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
             docker exec $CONTAINER_ID composer install
             docker exec $CONTAINER_ID php artisan key:generate
-            docker exec $CONTAINER_ID php artisan migrate:f --force
+            docker exec $CONTAINER_ID php artisan migrate --force
             docker exec $CONTAINER_ID php artisan config:clear
             docker exec $CONTAINER_ID php artisan route:clear
             docker exec $CONTAINER_ID php artisan view:clear
