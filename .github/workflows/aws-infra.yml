@@ -69,10 +69,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            set -e # Detener el script si un comando falla
+            set -e
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
             docker system prune --all --volumes -f
-            # aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
@@ -81,10 +81,11 @@ jobs:
               exit 1
             fi
             docker exec $CONTAINER_ID chmod -R 755 storage
-            docker exec $CONTAINER_ID chown -R www-data:www-data storage #Cambiar www-data por el usuario de tu servidor web
-            docker exec $CONTAINER_ID composer install 
+            docker exec $CONTAINER_ID chown -R www-data:www-data storage
+            docker exec $CONTAINER_ID composer install --no-interaction --optimize-autoloader
             docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build
+            docker exec $CONTAINER_ID touch .env # Crea el archivo .env vacío
             docker exec $CONTAINER_ID printf "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=http://${{ env.EC2_PUBLIC_IP }}\nDB_CONNECTION=mysql\nDB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}\nDB_PORT=3306\nDB_DATABASE=laravel\nDB_USERNAME=admin\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             docker exec $CONTAINER_ID php artisan key:generate --force
             docker exec $CONTAINER_ID php artisan migrate --force
