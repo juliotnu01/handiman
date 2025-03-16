@@ -61,16 +61,22 @@ jobs:
           source: "docker-compose-prod.yml"
           target: "/home/ec2-user/"
 
-      # 8. Desplegar contenedores en la instancia EC2 usando rutas completas y sudo
+      # 8. Desplegar contenedores en la instancia EC2
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.2
+        uses: appleboy/ssh-action@v1.3.7
         with:
           host: ${{ env.EC2_PUBLIC_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Se asume que AWS CLI está en /usr/bin/aws, Docker en /usr/bin/docker y Docker Compose en /usr/local/bin/docker-compose
-            sudo /usr/bin/aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo /usr/bin/docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            sudo /usr/bin/docker pull ${{ secrets.ECR_REGISTRY }}:lastest
-            sudo /usr/local/bin/docker-compose -f docker-compose-prod.yml up -d
+            # Espera a que Docker esté disponible en la instancia
+            until sudo env PATH=$PATH docker --version; do
+              echo "Waiting for Docker to be available..."
+              sleep 5
+            done
+            # Nota: Es indispensable que la instancia EC2 tenga asignado un IAM Role con permisos para ECR,
+            # ya que de lo contrario el comando aws ecr get-login-password fallará por "Unable to locate credentials"
+            sudo env PATH=$PATH aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo env PATH=$PATH docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            sudo env PATH=$PATH docker pull ${{ secrets.ECR_REGISTRY }}:lastest
+            sudo env PATH=$PATH docker-compose -f docker-compose-prod.yml up -d

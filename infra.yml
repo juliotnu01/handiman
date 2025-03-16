@@ -42,7 +42,7 @@ Resources:
           #!/bin/bash
           yum update -y
           amazon-linux-extras install docker -y
-          # Instalar la librería para libcrypt faltante
+          # Instalar la librería para resolver el error de libcrypt
           yum install -y libxcrypt-compat
           ldconfig
           service docker start
