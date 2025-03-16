@@ -71,7 +71,7 @@ Resources:
           sudo chmod +x /usr/local/bin/docker-compose
     DeletionPolicy: Delete
 
-  MyRDSInstance:
+   MyRDSInstance:
     Type: AWS::RDS::DBInstance
     DependsOn:
       - RDSSecurityGroup
@@ -81,10 +81,10 @@ Resources:
       MasterUserPassword: !Ref DBPassword
       DBName: laravel
       Engine: mysql
-      EngineVersion: "5.7.44"
-      DBInstanceClass: db.t4g.micro
-      AllocatedStorage: 20
-      PubliclyAccessible: true
+      EngineVersion: "8.0"  # Versión compatible con la capa gratuita
+      DBInstanceClass: db.t4g.micro  # Clase de instancia compatible con la capa gratuita
+      AllocatedStorage: 20  # Máximo de 20 GB para la capa gratuita
+      PubliclyAccessible: false  # Mejor práctica: desactiva el acceso público
       VPCSecurityGroups:
         - !GetAtt RDSSecurityGroup.GroupId
     DeletionPolicy: Snapshot
