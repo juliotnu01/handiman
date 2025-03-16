@@ -5,7 +5,8 @@ Parameters:
   DBPassword:
     Type: String
     NoEcho: true
-    Description: "secret"
+    Description: "Contraseña para la base de datos MySQL"
+    Default: "secret"  # Valor predeterminado
 
 # Recursos de la plantilla
 Resources:
