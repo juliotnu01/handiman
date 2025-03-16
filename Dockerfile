@@ -28,7 +28,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Instalamos las dependencias de Composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install
 
 # Instalamos las dependencias de Node.js DENTRO DEL CONTENEDOR
 RUN npm install && npm run build
