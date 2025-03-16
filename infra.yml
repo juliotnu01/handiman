@@ -6,7 +6,7 @@ Parameters:
     Type: String
     NoEcho: true
     Description: "Contraseña para la base de datos MySQL"
-    Default: "secret"  # Valor predeterminado
+    Default: "secretpassword"  # Valor predeterminado
   UbuntuAMI:
     Type: String
     Description: "ID de la AMI de Ubuntu 24.04 LTS"
