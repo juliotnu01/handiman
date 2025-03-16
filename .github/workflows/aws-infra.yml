@@ -69,28 +69,22 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -e # Detener el script si un comando falla
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
-            docker system prune --all --volumes
+            docker system prune --all --volumes -f
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
-            docker exec -it $CONTAINER_ID bash <<EOF
-            # chmod -R 777 storage/*
-            composer install
-            npm install
-            npm run build
-            echo "APP_NAME=Laravel" > .env
-            echo "APP_ENV=production" > .env
-            echo "APP_KEY=" > .env
-            echo "APP_DEBUG=false" >> .env
-            echo "APP_URL=http://${{ env.EC2_PUBLIC_IP }}" >> .env
-            echo "DB_CONNECTION=mysql" >> .env
-            echo "DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}" >> .env
-            echo "DB_PORT=3306" >> .env
-            echo "DB_DATABASE=laravel" >> .env
-            echo "DB_USERNAME=admin" >> .env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-            php artisan key:generate
-            php artisan migrate 
-            EOF
+            if [ -z "$CONTAINER_ID" ]; then
+              echo "Error: Container ID not found."
+              exit 1
+            fi
+            docker exec $CONTAINER_ID chmod -R 755 storage
+            docker exec $CONTAINER_ID chown -R www-data:www-data storage #Cambiar www-data por el usuario de tu servidor web
+            docker exec $CONTAINER_ID composer install 
+            docker exec $CONTAINER_ID npm install
+            docker exec $CONTAINER_ID npm run build
+            docker exec $CONTAINER_ID printf "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=http://${{ env.EC2_PUBLIC_IP }}\nDB_CONNECTION=mysql\nDB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}\nDB_PORT=3306\nDB_DATABASE=laravel\nDB_USERNAME=admin\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+            docker exec $CONTAINER_ID php artisan key:generate --force
+            docker exec $CONTAINER_ID php artisan migrate --force
