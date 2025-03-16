@@ -75,7 +75,7 @@ jobs:
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
-            docker exec -it $CONTAINER_ID bash
+            docker exec -it $CONTAINER_ID bash <<EOF
             # chmod -R 777 storage/*
             composer install
             npm install
@@ -93,4 +93,4 @@ jobs:
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
             php artisan key:generate
             php artisan migrate 
-            
+            EOF
