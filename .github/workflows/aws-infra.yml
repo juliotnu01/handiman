@@ -92,11 +92,11 @@ jobs:
             LOG_LEVEL=error
 
             DB_CONNECTION=mysql
-            DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}
+            DB_HOST=laravel-db.c9ggq08s6bc2.us-east-2.rds.amazonaws.com
             DB_PORT=3306
             DB_DATABASE=laravel
             DB_USERNAME=admin
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PASSWORD=secretpassword
 
             BROADCAST_DRIVER=log
             CACHE_DRIVER=file
@@ -139,7 +139,7 @@ jobs:
             VITE_PUSHER_PORT="${PUSHER_PORT}"
             VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
             VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-            
+
             EOF"
             docker exec $CONTAINER_ID chmod -R 755 storage
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
