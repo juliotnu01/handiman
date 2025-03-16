@@ -61,7 +61,7 @@ jobs:
           source: "docker-compose-prod.yml"
           target: "/home/ec2-user/"
 
-      # 8. Desplegar contenedores en la instancia EC2 usando sudo
+      # 8. Desplegar contenedores en la instancia EC2 usando rutas completas y sudo
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -70,6 +70,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            sudo docker pull ${{ secrets.ECR_REGISTRY }}:lastest
-            sudo docker-compose -f docker-compose-prod.yml up -d
+            # Se asume que AWS CLI está en /usr/bin/aws, Docker en /usr/bin/docker y Docker Compose en /usr/local/bin/docker-compose
+            sudo /usr/bin/aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo /usr/bin/docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            sudo /usr/bin/docker pull ${{ secrets.ECR_REGISTRY }}:lastest
+            sudo /usr/local/bin/docker-compose -f docker-compose-prod.yml up -d
