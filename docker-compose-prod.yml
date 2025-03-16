@@ -19,7 +19,6 @@ services:
       - "8025:8025"
     networks:
       - laravel-network
-
 networks:
   laravel-network:
     driver: bridge
