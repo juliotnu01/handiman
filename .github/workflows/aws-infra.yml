@@ -81,9 +81,9 @@ jobs:
             fi
             docker exec $CONTAINER_ID bash -c "cat > .env <<EOF
             APP_NAME=Laravel
-            APP_ENV=production
+            APP_ENV=local
             APP_KEY=
-            APP_DEBUG=false
+            APP_DEBUG=true
             APP_URL=http://${{ env.EC2_PUBLIC_IP }}
             DB_CONNECTION=mysql
             DB_HOST=laravel-db.c9ggq08s6bc2.us-east-2.rds.amazonaws.com
@@ -99,6 +99,6 @@ jobs:
             docker exec $CONTAINER_ID composer install
             docker exec $CONTAINER_ID php artisan key:generate
             sleep 10
-            docker exec $CONTAINER_ID php artisan migrate:f 
+            docker exec $CONTAINER_ID php artisan migrate:f --force
             docker exec $CONTAINER_ID npm install -d 
             docker exec $CONTAINER_ID npm run build
