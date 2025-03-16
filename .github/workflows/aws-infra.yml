@@ -97,8 +97,8 @@ jobs:
             docker exec $CONTAINER_ID chmod -R 755 storage
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
             docker exec $CONTAINER_ID composer install
-            docker exec $CONTAINER_ID npm install
-            docker exec $CONTAINER_ID npm run build
             docker exec $CONTAINER_ID php artisan key:generate
             sleep 10
-            docker exec $CONTAINER_ID php artisan migrate
+            docker exec $CONTAINER_ID php artisan migrate:f 
+            docker exec $CONTAINER_ID npm install -d 
+            docker exec $CONTAINER_ID npm run build
