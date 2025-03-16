@@ -7,6 +7,10 @@ Parameters:
     NoEcho: true
     Description: "Contraseña para la base de datos MySQL"
     Default: "secret"  # Valor predeterminado
+  UbuntuAMI:
+    Type: String
+    Description: "ID de la AMI de Ubuntu 24.04 LTS"
+    Default: "ami-0cb91c7de36eed2cb"  # Puedes cambiar este valor según la región
 
 # Recursos de la plantilla
 Resources:
@@ -41,7 +45,7 @@ Resources:
     DependsOn:
       - EC2SecurityGroup
     Properties:
-      ImageId: ami-0cb91c7de36eed2cb  # AMI Ubuntu 24
+      ImageId: !Ref UbuntuAMI  # Referencia al parámetro
       InstanceType: t2.micro
       KeyName: KeypairGithub
       SecurityGroupIds:
