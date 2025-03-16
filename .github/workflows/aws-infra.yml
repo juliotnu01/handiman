@@ -79,22 +79,16 @@ jobs:
               echo "Error: Container ID not found."
               exit 1
             fi
+            scp -i ${{ secrets.SSH_PRIVATE_KEY }} .env ubuntu@${{ env.EC2_PUBLIC_IP }}:/home/ubuntu/
+            docker cp /home/ubuntu/.env $CONTAINER_ID:/var/www/html/.env
+            docker exec $CONTAINER_ID sed -i "s/APP_URL=/APP_URL=http:\/\/${{ env.EC2_PUBLIC_IP }}/" /var/www/html/.env
+            docker exec $CONTAINER_ID sed -i "s/DB_HOST=/DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}/" /var/www/html/.env
+            docker exec $CONTAINER_ID sed -i "s/DB_PASSWORD=/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" /var/www/html/.env
             docker exec $CONTAINER_ID chmod -R 755 storage
             docker exec $CONTAINER_ID chown -R www-data:www-data storage
             docker exec $CONTAINER_ID composer install --no-interaction --optimize-autoloader
             docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build
-            docker exec $CONTAINER_ID touch .env # Crea el archivo .env vacío
-            docker exec $CONTAINER_ID printf "APP_NAME=Laravel\n
-                                              APP_ENV=production\n
-                                              APP_KEY=\n
-                                              APP_DEBUG=false\n
-                                              APP_URL=http://${{ env.EC2_PUBLIC_IP }}\n
-                                              DB_CONNECTION=mysql\n
-                                              DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}\n
-                                              DB_PORT=3306\n
-                                              DB_DATABASE=laravel\n
-                                              DB_USERNAME=admin\n
-                                              DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
-            docker exec $CONTAINER_ID php artisan key:generate --force
-            docker exec $CONTAINER_ID php artisan migrate --force
+            docker exec $CONTAINER_ID php artisan key:generate 
+            sleep 10
+            docker exec $CONTAINER_ID php artisan migrate  
