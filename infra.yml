@@ -10,12 +10,6 @@ Parameters:
 
 # Recursos de la plantilla
 Resources:
-  MyInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - EC2InstanceProfileForImageBuilder  # Nombre del rol existente
-
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -52,7 +46,7 @@ Resources:
       KeyName: KeypairGithub
       SecurityGroupIds:
         - !GetAtt EC2SecurityGroup.GroupId
-      IamInstanceProfile: !Ref MyInstanceProfile
+      IamInstanceProfile: "EC2InstanceProfileForImageBuilder"  # Referencia al perfil existente
       UserData:
         Fn::Base64: |
           #!/bin/bash
