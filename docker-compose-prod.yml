@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  app:
+    image: 545009837147.dkr.ecr.us-east-2.amazonaws.com/laravel-app:latest
+    container_name: laravel-app
+    restart: unless-stopped
+    ports:
+      - "80:80"   # El puerto 80 del host se redirige al 80 del contenedor
+      - "5173:5173"  # (opcional, si requieres Vite HMR en producción)
+    networks:
+      - laravel-network
+    environment:
+      # Configura las variables de entorno necesarias para Laravel, 
+      # por ejemplo, DB_HOST apuntando al endpoint de RDS, etc.
+      # DB_HOST: "<RDSEndpoint obtenido en CloudFormation>"
+  mailpit:
+    image: axllent/mailpit
+    container_name: laravel-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    driver: bridge

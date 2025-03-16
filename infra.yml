@@ -31,7 +31,7 @@ Resources:
     DependsOn:
       - EC2SecurityGroup
     Properties:
-      ImageId: ami-0d0f28110d16ee7d6 # AMI de Amazon Linux 2
+      ImageId: ami-0d0f28110d16ee7d6  # AMI de Amazon Linux 2
       InstanceType: t2.micro
       KeyName: KeypairGithub
       SecurityGroupIds:
@@ -65,7 +65,7 @@ Resources:
       VPCSecurityGroups:
         - !GetAtt RDSSecurityGroup.GroupId
     DeletionPolicy: Snapshot
-    
+
 Outputs:
   MyEC2InstancePublicIP:
     Description: "Public IP address of the EC2 instance"
