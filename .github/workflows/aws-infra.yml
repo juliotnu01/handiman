@@ -61,7 +61,7 @@ jobs:
           target: "/home/ubuntu/"
 
       # 8. Desplegar contenedores en la instancia EC2
-      - name: Deploy to EC2
+      - name: Deploy to EC2 and Configure Laravel
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.EC2_PUBLIC_IP }}
@@ -69,9 +69,40 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Autenticar Docker en ECR usando el token generado
-            echo "${{ env.LOGIN_TOKEN }}" | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            # 1. Autenticar Docker en ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-            # Descargar imágenes y ejecutar contenedores
+            # 2. Descargar imágenes y ejecutar contenedores
             docker pull ${{ secrets.ECR_REGISTRY }}/laravel-app:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
+
+            # 3. Entrar al contenedor Laravel
+            CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}/laravel-app:latest")
+            docker exec -it $CONTAINER_ID bash <<EOF
+
+            # 4. Crear o actualizar el archivo .env
+            echo "APP_NAME=Laravel" > .env
+            echo "APP_ENV=production" >> .env
+            echo "APP_KEY=base64:xQFJYeKT3DYIRcrHzZouGICt/JNnVmABWShI+wn6bYc=" >> .env
+            echo "APP_DEBUG=false" >> .env
+            echo "APP_URL=http://${{ env.EC2_PUBLIC_IP }}" >> .env
+            echo "LOG_CHANNEL=stack" >> .env
+            echo "LOG_LEVEL=error" >> .env
+            echo "DB_CONNECTION=mysql" >> .env
+            echo "DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}" >> .env
+            echo "DB_PORT=3306" >> .env
+            echo "DB_DATABASE=laravel" >> .env
+            echo "DB_USERNAME=admin" >> .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
+            # 5. Instalar dependencias y configurar Laravel
+            composer install --no-dev --optimize-autoloader
+            npm install
+            npm run build
+            php artisan key:generate
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            EOF
