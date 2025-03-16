@@ -36,11 +36,14 @@ Resources:
       KeyName: KeypairGithub
       SecurityGroupIds:
         - !GetAtt EC2SecurityGroup.GroupId
+      # Se recomienda asignar un IAM Role con permisos para ECR y demás servicios necesarios
       UserData:
         Fn::Base64: |
           #!/bin/bash
           yum update -y
           amazon-linux-extras install docker -y
+          # Instala la librería para solucionar el error de libcrypt
+          yum install -y libxcrypt-compat
           service docker start
           usermod -aG docker ec2-user
           chkconfig docker on
