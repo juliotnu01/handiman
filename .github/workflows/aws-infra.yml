@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,14 +42,12 @@ jobs:
           echo "EC2_PUBLIC_IP=$EC2_IP" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
-      # 6. Autenticar en ECR, construir y subir imagen Docker
-      - name: Build and Push Docker Image
+      # 6. Generar token de autenticación para ECR
+      - name: Generate ECR login token
+        id: ecr_login
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
-          docker build -t ${{ secrets.ECR_REGISTRY }}:latest -f Dockerfile .
-          docker push ${{ secrets.ECR_REGISTRY }}:latest
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          LOGIN_TOKEN=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
+          echo "LOGIN_TOKEN=$LOGIN_TOKEN" >> $GITHUB_ENV
 
       # 7. Copiar docker-compose-prod.yml a la instancia EC2
       - name: Copy docker-compose-prod.yml to EC2
@@ -70,6 +69,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            sudo docker pull ${{ secrets.ECR_REGISTRY }}:latest
-            sudo docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
+            # Autenticar Docker en ECR usando el token generado
+            echo "${{ env.LOGIN_TOKEN }}" | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+            # Descargar imágenes y ejecutar contenedores
+            docker pull ${{ secrets.ECR_REGISTRY }}/laravel-app:latest
+            docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
