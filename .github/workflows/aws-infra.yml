@@ -86,7 +86,7 @@ jobs:
             APP_DEBUG=false
             APP_URL=http://${{ env.EC2_PUBLIC_IP }}
             DB_CONNECTION=mysql
-            DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}
+            DB_HOST=laravel-db.c9ggq08s6bc2.us-east-2.rds.amazonaws.com
             DB_PORT=3306
             DB_DATABASE=laravel
             DB_USERNAME=admin
