@@ -69,68 +69,28 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # 1. Detener y eliminar contenedores existentes
-            echo "Deteniendo y eliminando contenedores existentes..."
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
-
-            # 2. Eliminar imágenes antiguas (opcional)
-            echo "Eliminando imágenes antiguas..."
             docker system prune --all --volumes
-
-            # 3. Autenticar Docker en ECR
-            echo "Autenticando Docker en ECR..."
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-
-            # 4. Descargar imágenes y ejecutar contenedores
-            echo "Descargando imágenes y ejecutando contenedores..."
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
-
-            # 5. Entrar al contenedor Laravel
-            echo "Entrando al contenedor Laravel..."
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
-            docker exec -it $CONTAINER_ID bash <<EOF
-
-            # 6. Dar permisos a los directorios necesarios
-            echo "Asignando permisos a storage y bootstrap/cache..."
-            chmod -R 775 storage bootstrap/cache
-
-            # 7. Instalar dependencias de Composer
-            echo "Instalando dependencias de Composer..."
-            composer install --no-dev --optimize-autoloader
-
-            # 8. Instalar dependencias de NPM
-            echo "Instalando dependencias de NPM..."
+            docker exec -it $CONTAINER_ID bash
+            chmod -R 777 storage/*
+            composer install
             npm install
             npm run build
-
-            # 9. Crear o actualizar el archivo .env
-            echo "Creando archivo .env..."
             echo "APP_NAME=Laravel" > .env
-            echo "APP_ENV=production" >> .env
+            echo "APP_ENV=production" > .env
+            echo "APP_KEY=" > .env
             echo "APP_DEBUG=false" >> .env
             echo "APP_URL=http://${{ env.EC2_PUBLIC_IP }}" >> .env
-            echo "LOG_CHANNEL=stack" >> .env
-            echo "LOG_LEVEL=error" >> .env
             echo "DB_CONNECTION=mysql" >> .env
             echo "DB_HOST=${{ steps.cfn_outputs.outputs.RDSEndpoint }}" >> .env
             echo "DB_PORT=3306" >> .env
             echo "DB_DATABASE=laravel" >> .env
             echo "DB_USERNAME=admin" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-
-            # 10. Generar la clave de aplicación
-            echo "Generando clave de aplicación..."
             php artisan key:generate
-
-            # 11. Ejecutar migraciones
-            echo "Ejecutando migraciones..."
-            php artisan migrate --force
-
-            # 12. Limpiar caché y optimizar la aplicación
-            echo "Limpiando caché y optimizando la aplicación..."
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-
-            EOF
+            php artisan migrate 
+            
