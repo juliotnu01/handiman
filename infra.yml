@@ -46,7 +46,7 @@ Resources:
       - EC2SecurityGroup
     Properties:
       ImageId: !Ref UbuntuAMI  # Referencia al parámetro
-      InstanceType: t2.micro
+      InstanceType: t4g.nano
       KeyName: KeypairGithub
       SecurityGroupIds:
         - !GetAtt EC2SecurityGroup.GroupId
