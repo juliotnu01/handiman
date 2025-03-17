@@ -80,9 +80,9 @@ jobs:
             set -e
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
             docker system prune --all --volumes -f
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
             if [ -z "$CONTAINER_ID" ]; then
               echo "Error: Container ID not found."
