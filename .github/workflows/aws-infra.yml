@@ -159,5 +159,5 @@ jobs:
             docker exec $CONTAINER_ID php artisan route:clear
             docker exec $CONTAINER_ID php artisan view:clear
             docker exec $CONTAINER_ID php artisan cache:clear
-            docker exec $CONTAINER_ID npm install -d
+            docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build
