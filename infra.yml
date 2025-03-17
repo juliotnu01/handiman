@@ -9,8 +9,8 @@ Parameters:
     Default: "secretpassword"  # Valor predeterminado
   UbuntuAMI:
     Type: String
-    Description: "ID de la AMI de Ubuntu 24.04 LTS"
-    Default: "ami-0cb91c7de36eed2cb"  # Puedes cambiar este valor según la región
+    Description: "ID de la AMI de Ubuntu 24.04 LTS (ARM)"
+    Default: "ami-0ac5d9e789dbb455a"  # Puedes cambiar este valor según la región
 
 # Recursos de la plantilla
 Resources:
