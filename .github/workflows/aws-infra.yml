@@ -48,7 +48,7 @@ jobs:
         run: |
           LOGIN_TOKEN=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
           echo "LOGIN_TOKEN=$LOGIN_TOKEN" >> $GITHUB_ENV
-      
+
       - name: Build and Push Docker Image
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
@@ -80,7 +80,7 @@ jobs:
             set -e
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
             docker system prune --all --volumes -f
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            echo "${{ steps.ecr_login.outputs.login_token }}" | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
@@ -101,7 +101,7 @@ jobs:
             LOG_LEVEL=error
 
             DB_CONNECTION=mysql
-            DB_HOST=laravel-db.c9ggq08s6bc2.us-east-2.rds.amazonaws.com
+            DB_HOST=${{ env.RDS_ENDPOINT }}
             DB_PORT=3306
             DB_DATABASE=laravel
             DB_USERNAME=admin
