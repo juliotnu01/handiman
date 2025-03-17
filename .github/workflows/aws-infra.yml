@@ -80,7 +80,7 @@ jobs:
             set -e
             docker-compose -f /home/ubuntu/docker-compose-prod.yml down --remove-orphans --volumes
             docker system prune --all --volumes -f
-            echo "${{ steps.ecr_login.outputs.login_token }}" | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            echo "${{ env.LOGIN_TOKEN }}" | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
             docker-compose -f /home/ubuntu/docker-compose-prod.yml up -d
             CONTAINER_ID=$(docker ps -qf "ancestor=${{ secrets.ECR_REGISTRY }}:latest")
