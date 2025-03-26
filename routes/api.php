@@ -37,3 +37,4 @@ Route::post('/upload-certificates', [UsersController::class, 'storeCertications'
 Route::post('/store-payment-method', [UsersController::class, 'storePaymentMethod'])->name('store.payment.method');
 Route::get('/reviews/paginated/{userId}', [ReviewsUserController::class, 'getPaginatedReviewsByUser'])->name('reviews.paginated.user');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
+Route::post('/register-user', [ExternalLoginController::class, 'register'])->name('register.user');
