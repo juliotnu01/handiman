@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ExternalLoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VerificationIDController;
 use App\Http\Controllers\ReviewsUserController;
+use App\Http\Controllers\VerificationEmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,3 +39,5 @@ Route::post('/store-payment-method', [UsersController::class, 'storePaymentMetho
 Route::get('/reviews/paginated/{userId}', [ReviewsUserController::class, 'getPaginatedReviewsByUser'])->name('reviews.paginated.user');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
 Route::post('/register-user', [ExternalLoginController::class, 'register'])->name('register.user');
+Route::get('/verify-email/{code}', [VerificationEmailController::class, 'verify'])->name('verify.email');
+Route::post('/resend-verification-email', [VerificationEmailController::class, 'resend'])->name('resend.verification.email');

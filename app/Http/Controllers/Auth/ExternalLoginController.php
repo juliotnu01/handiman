@@ -16,7 +16,7 @@ class ExternalLoginController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-            $user = User::where('email', $request->email)->with(['basicInformation', 'certifications', 'paymentMethods'])->first();
+            $user = User::where('email', $request->email)->with(['basicInformation', 'certifications', 'paymentMethods', 'emailVerification'])->first();
             if ($user && Hash::check($request->password, $user->password)) {
                 return response()->json(["valid" => true, "user" => $user]);
             }
@@ -40,7 +40,7 @@ class ExternalLoginController extends Controller
                 'email.email' => 'El correo electrónico debe ser una dirección válida.',
                 'email.unique' => 'El correo electrónico ya está registrado.',
                 'mode.required' => 'El modo es obligatorio.',
-                'mode.in' => 'El modo debe ser cliente o admin.',
+                'mode.in' => 'El modo debe ser cliente o especialista.',
                 'name.required' => 'El nombre es obligatorio.',
                 'name.string' => 'El nombre debe ser una cadena de texto.',
                 'name.max' => 'El nombre no puede tener más de 255 caracteres.',

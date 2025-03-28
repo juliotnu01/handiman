@@ -160,5 +160,6 @@ jobs:
             docker exec $CONTAINER_ID php artisan view:clear
             docker exec $CONTAINER_ID php artisan cache:clear
             docker exec $CONTAINER_ID php artisan storage:link
+            docker exec $CONTAINER_ID composer dump-autoload
             docker exec $CONTAINER_ID npm install
             docker exec $CONTAINER_ID npm run build

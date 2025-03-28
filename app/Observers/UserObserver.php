@@ -18,6 +18,7 @@ class UserObserver
     {
         // Enviar correo electrónico al usuario registrado
         Mail::to($user->email)->send(new WelcomeEmail($user));
+        $user->sendEmailVerificationNotification();
     }
 
     /**
