@@ -29,7 +29,7 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::post('/store', [ServicioController::class, 'store']);
 });
 
-
+Route::get('/user/{id}', [UsersController::class, 'getUserById'])->name('user.get.by.id');
 Route::post('/update-avatar', [UsersController::class, 'updateAvatar'])->name('update.avatar');
 Route::get('/user-basic-information/{id}', [UsersController::class, 'getUserWithBasicInformation'])->name('user.basic.information');
 Route::post('/store-basic-information', [UsersController::class, 'storeBasicInformation'])->name('store.basic.information');

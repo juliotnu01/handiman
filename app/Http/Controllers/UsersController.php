@@ -22,7 +22,7 @@ class UsersController extends Controller
         $search = $request->input('search');
         $searchBy = $request->input('search_by');
 
-        $query = User::with(['certifications', 'paymentMethods']);
+        $query = User::with(['certifications', 'paymentMethods', 'basicInformation']);
 
         if ($search && $searchBy) {
             $query->where($searchBy, 'like', '%' . $search . '%');
@@ -33,6 +33,18 @@ class UsersController extends Controller
         return Inertia::render('Usuarios', [
             'usuarios' => $usuarios,
         ]);
+    }
+
+    public function getUserById($id)
+    {
+        try {
+            $user = User::with(['certifications', 'paymentMethods', 'basicInformation'])->findOrFail($id);
+            return response()->json(['user' => $user], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la información del usuario', 'details' => $e->getMessage()], 500);
+        }
     }
 
     /**
