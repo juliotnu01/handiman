@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Traits\EmailVerifiable;
+use App\Models\DireccionesUser;
 
 class User extends Authenticatable
 {
@@ -66,7 +67,8 @@ class User extends Authenticatable
         'has_all_verifications',
         'has_approved_certifications',
         'has_active_payment_methods',
-        'review_stats', // Añadimos el nuevo atributo
+        'review_stats', 
+        'addresses',
     ];
 
     public function basicInformation()
@@ -158,6 +160,28 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn() => $this->checkActivePaymentMethods(),
         );
+    }
+
+    /**
+     * Definir el atributo personalizado `addresses`.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function addresses(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->getAllAddresses(),
+        );
+    }
+
+    /**
+     * Método privado para obtener todas las direcciones asociadas al usuario.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    private function getAllAddresses()
+    {
+        return $this->hasMany(DireccionesUser::class, 'user_id')->get();
     }
 
     /**

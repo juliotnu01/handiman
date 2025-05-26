@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\{User, DireccionesUser};
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
@@ -205,6 +205,33 @@ class UsersController extends Controller
             return response()->json(['message' => 'Avatar actualizado con éxito'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al actualizar el avatar', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function storeUserAddress(Request $request)
+    {
+
+        try {
+            $address = new DireccionesUser([
+                'direccion' => $request->input('direccion'),
+                'user_id' => $request->input('user_id'),
+            ]);
+            $address->save();
+            return response()->json(['message' => 'Dirección guardada con éxito', "data" => $address], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al guardar la dirección', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateAddressStatus(Request $request, $id)
+    {
+        try {
+            $address = DireccionesUser::findOrFail($id);
+            $address->status = $request->input('status');
+            $address->save();
+            return response()->json(['message' => 'Estado de la dirección actualizado con éxito', 'data' => $address], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar el estado de la dirección', 'details' => $e->getMessage()], 500);
         }
     }
 

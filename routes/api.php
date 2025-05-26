@@ -28,7 +28,9 @@ Route::group(['prefix' => 'servicios'],function () {
     Route::get('/', [ServicioController::class, 'index']);
     Route::post('/store', [ServicioController::class, 'store']);
 });
-
+/**
+ * ------------- user 
+ */
 Route::get('/user/{id}', [UsersController::class, 'getUserById'])->name('user.get.by.id');
 Route::post('/update-avatar', [UsersController::class, 'updateAvatar'])->name('update.avatar');
 Route::get('/user-basic-information/{id}', [UsersController::class, 'getUserWithBasicInformation'])->name('user.basic.information');
@@ -36,6 +38,13 @@ Route::post('/store-basic-information', [UsersController::class, 'storeBasicInfo
 Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('verify.user');
 Route::post('/upload-certificates', [UsersController::class, 'storeCertications'])->name('upload.certificates.user');
 Route::post('/store-payment-method', [UsersController::class, 'storePaymentMethod'])->name('store.payment.method');
+Route::post('/store-user-address', [UsersController::class, 'storeUserAddress'])->name('store.user.address');
+Route::put('/update-status-user-address', [UsersController::class, 'storeUserAddress'])->name('store.status.user.address');
+/**
+ * ------------- end user 
+ */
+
+
 Route::get('/reviews/paginated/{userId}', [ReviewsUserController::class, 'getPaginatedReviewsByUser'])->name('reviews.paginated.user');
 Route::post('/verify-login', [ExternalLoginController::class, 'verify']);
 Route::post('/register-user', [ExternalLoginController::class, 'register'])->name('register.user');
