@@ -39,7 +39,8 @@ Route::post('/verify-user', [VerificationIDController::class, 'store'])->name('v
 Route::post('/upload-certificates', [UsersController::class, 'storeCertications'])->name('upload.certificates.user');
 Route::post('/store-payment-method', [UsersController::class, 'storePaymentMethod'])->name('store.payment.method');
 Route::post('/store-user-address', [UsersController::class, 'storeUserAddress'])->name('store.user.address');
-Route::put('/update-status-user-address', [UsersController::class, 'storeUserAddress'])->name('store.status.user.address');
+Route::put('/update-user-address-status/{id}', [UsersController::class, 'updateAddressStatus'])->name('update.status.user.address');
+Route::delete('/delete-user-address/{id}', [UsersController::class, 'deleteAddress'])->name('delete.ser.address');
 /**
  * ------------- end user 
  */

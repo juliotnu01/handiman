@@ -226,12 +226,30 @@ class UsersController extends Controller
     public function updateAddressStatus(Request $request, $id)
     {
         try {
+
             $address = DireccionesUser::findOrFail($id);
-            $address->status = $request->input('status');
-            $address->save();
-            return response()->json(['message' => 'Estado de la dirección actualizado con éxito', 'data' => $address], 200);
+
+            // Verifica explícitamente si el campo está presente y no es nulo
+            if ($request->filled('status')) {
+                $address->status = $request->boolean('status'); // Usa el helper boolean() de Laravel
+                $address->save();
+                return response()->json(['message' => 'Estado actualizado', 'data' => $address], 200);
+            }
+            return response()->json(['error' => 'Campo status faltante'], 400);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al actualizar el estado de la dirección', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al actualizar', 'details' => $e->getMessage()], 500);
+        }
+    }
+    public function deleteAddress(Request $request, $id)
+    {
+        try {
+            $address = DireccionesUser::findOrFail($id);
+            $address->delete();
+            return response()->json(['message' => 'Dirección eliminada con éxito'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Dirección no encontrada'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al eliminar la dirección', 'details' => $e->getMessage()], 500);
         }
     }
 
