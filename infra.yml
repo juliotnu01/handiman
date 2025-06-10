@@ -40,6 +40,12 @@ Resources:
           SourceSecurityGroupId: !GetAtt EC2SecurityGroup.GroupId
     DeletionPolicy: Delete
 
+  MyElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref MyEC2Instance
+  
   MyEC2Instance:
     Type: AWS::EC2::Instance
     DependsOn:
@@ -97,7 +103,7 @@ Resources:
 Outputs:
   MyEC2InstancePublicIP:
     Description: "Dirección IP pública de la instancia EC2"
-    Value: !GetAtt MyEC2Instance.PublicIp
+    Value: !Ref MyElasticIP
   RDSEndpoint:
     Description: "Endpoint de la instancia RDS"
     Value: !GetAtt MyRDSInstance.Endpoint.Address
