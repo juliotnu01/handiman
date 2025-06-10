@@ -52,8 +52,8 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
-          docker build -t ${{ secrets.ECR_REGISTRY }}:latest -f Dockerfile .
-          docker push ${{ secrets.ECR_REGISTRY }}:latest
+          # Especificar la plataforma de construcción
+          docker buildx build --platform linux/arm64/v8 -t ${{ secrets.ECR_REGISTRY }}:latest --push -f Dockerfile .
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # 7. Copiar docker-compose-prod.yml a la instancia EC2
