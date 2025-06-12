@@ -20,7 +20,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       # 3. Verificar credenciales de AWS
-      - name: Verify AWS Credentials
+      - name: Verify AWS Credentials 
         run: aws sts get-caller-identity
 
       # 4. Desplegar infraestructura con CloudFormation
